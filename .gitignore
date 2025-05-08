@@ -1,0 +1,46 @@
+# Python bytecode files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Virtual environments
+venv/
+env/
+
+# Django database and migrations
+db.sqlite3
+*.log
+
+# Django secret keys and sensitive data
+*.pem
+*.key
+
+# Django static files (if you're not collecting them for production)
+static/
+
+# Media files (if stored in the project folder)
+media/
+
+# Django migrations
+*/migrations/*
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*~
+*.sublime-workspace
+*.sublime-project
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Python virtual environment settings
+Pipfile
+Pipfile.lock
+
+# Ignore the settings for keeping private keys and certificates safe
+private_key.pem
+public_key.pem
