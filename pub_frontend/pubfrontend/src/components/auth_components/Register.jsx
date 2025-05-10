@@ -15,7 +15,8 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { post_encryped_data } from "../api/api_services";
-import logo from '../assets/logo.JPG';
+import logo from "../../assets/logo.JPG";
+
 
 
 const Registration = () => {

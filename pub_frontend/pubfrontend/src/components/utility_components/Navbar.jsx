@@ -8,7 +8,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { IconButton, Drawer, List, ListItem, ListItemText, Stack, } from "@mui/material";
 import { useLocation, Link } from "react-router-dom";
-import logo from '../assets/logo.JPG';
+import logo from "../../assets/logo.JPG";
 //import { PostContext } from './postcontext';
 import MenuIcon from "@mui/icons-material/Menu";
 import { AuthContext } from "../../providers/AuthContext";

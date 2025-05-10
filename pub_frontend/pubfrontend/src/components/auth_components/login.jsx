@@ -16,7 +16,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   maxWidth: 400,
   margin: 'auto',
 }));
-import logo from '../assets/logo.JPG';
+import logo from "../../assets/logo.JPG";
 
 
 const StyledForm = styled('form')(({ theme }) => ({

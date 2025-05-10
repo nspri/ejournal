@@ -1,19 +1,19 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { AuthContext } from './AuthContext'; // Adjust the import based on your file structure
-
+import { dev_API_BASE_URL } from '../components/api/api_services';
 // Create the UserContext
 export const UserContext = createContext();
 
 // Create the UserProvider component
 export const UserProvider = ({ children }) => {
   const { isLoggedIn } = useContext(AuthContext);
-  
+
   // Separate state variables for art, clothing, and comics
-  const [artData, setArtData] = useState(() => {
-    const storedArtData = sessionStorage.getItem('artData');
-    return storedArtData ? JSON.parse(storedArtData) : [];
+  const [articleData, setArticleData] = useState(() => {
+    const storedArticleData = sessionStorage.getItem('articleData');
+    return storedArticleData ? JSON.parse(storedArticleData) : [];
   });
-  
+
   const [clothingData, setClothingData] = useState(() => {
     const storedClothingData = sessionStorage.getItem('clothingData');
     return storedClothingData ? JSON.parse(storedClothingData) : [];
@@ -28,21 +28,22 @@ export const UserProvider = ({ children }) => {
   const fetchUserData = async () => {
     if (isLoggedIn) {
       try {
-        const response = await fetch('https://npvbackend.onrender.com/shop/getall'); // Replace with your API endpoint
+
+        const response = await fetch(`${dev_API_BASE_URL}${"/articles/articles"}`);//shop / getall'); // Replace with your API endpoint
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
 
         // Store data separately in state and sessionStorage
-        setArtData(data.art);
-        setClothingData(data.clothing);
-        setComicsData(data.comics);
-        console.log(data.comics)
-        
-        sessionStorage.setItem('artData', JSON.stringify(data.art));
-        sessionStorage.setItem('clothingData', JSON.stringify(data.clothing));
-        sessionStorage.setItem('comicsData', JSON.stringify(data.comics));
+        setArticleData(data);
+        //setClothingData(data.clothing);
+        //setComicsData(data.comics);
+        //console.log(data.comics)
+
+        sessionStorage.setItem('articleData', JSON.stringify(data));
+        //sessionStorage.setItem('clothingData', JSON.stringify(data.clothing));
+        //sessionStorage.setItem('comicsData', JSON.stringify(data.comics));
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -80,15 +81,15 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider 
-      value={{ 
-        artData, 
-        clothingData, 
-        comicsData, 
+    <UserContext.Provider
+      value={{
+        articleData,
+        //clothingData,
+        //comicsData,
         getItemById,
-        updateArtData, 
-        updateClothingData, 
-        updateComicsData 
+        updateArtData,
+        updateClothingData,
+        updateComicsData
       }}>
       {children}
     </UserContext.Provider>

@@ -36,7 +36,7 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractUser):
     email = models.CharField(max_length=80, unique=True)
     username = models.CharField(max_length=45, unique=True)
-    firstnamwe = models.CharField(max_length=45, default="john")
+    firstname = models.CharField(max_length=45, default="john")
     lastname = models.CharField(max_length=45, default="doe")
     date_of_birth = models.DateField(null=True, default="2000-01-01")
 
@@ -56,7 +56,7 @@ class Profile(models.Model):
     phonenumber = models.CharField(default="", max_length=30)
 
     def __str__(self):
-        return f"{selfy.username} Profile"
+        return f"{self.user.username} Profile"
 
 
 # Create your models here.

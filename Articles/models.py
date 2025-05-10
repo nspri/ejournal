@@ -7,7 +7,12 @@ User = get_user_model()
 
 class Article(models.Model):
     title = models.CharField(max_length=255)
-    content = models.TextField()
+    file = models.FileField(upload_to="article_files/")
+    submitted_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True, related_name="articles"
+    )
+    reviewed = models.BooleanField(default=False)
+    reviewed_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     # author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="articles")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -19,12 +24,16 @@ class Article(models.Model):
 
 
 class Author(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    firstname = models.CharField(max_length=45, default="john")
+    lastname = models.CharField(max_length=45, default="doe")
+    title = models.CharField(max_length=45, null=True)
+    article = models.ForeignKey(
+        Article, on_delete=models.CASCADE, related_name="authors"
+    )
     contribution_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.firstnamwe} {self.user.lastname} - {self.article.title}"
+        return f"{self.firstname} {self.lastname} - {self.article.title}"
 
 
 # Create your models here.
