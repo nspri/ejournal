@@ -21,7 +21,9 @@ static/
 
 # Media files (if stored in the project folder)
 media/
-
+article_files/
+article_images/
+profile_pics/
 # Django migrations
 */migrations/*
 
