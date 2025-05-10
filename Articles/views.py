@@ -28,7 +28,10 @@ class ArticleAPIView(APIView):
             # article = get_object_or_404(Article, pk=pk)
             # authors = Author.objects.filter(article=article)
             articles = Article.objects.prefetch_related(
-                Prefetch("authors", queryset=Author.objects.all())
+                Prefetch(
+                    "authors",  # related_name from authorToarticle
+                    queryset=authorToarticle.objects.select_related("author"),
+                )
             )
             for article in articles:
                 print(article.title)
@@ -37,7 +40,13 @@ class ArticleAPIView(APIView):
             # author_serializer = AuthorSerializer(authors, many=True)
             serializer = ArticleSerializer(article)
         else:
-            articles = Article.objects.all()
+            # articles = Article.objects.all()
+            articles = Article.objects.prefetch_related(
+                Prefetch(
+                    "authors",  # related_name from authorToarticle
+                    queryset=authorToarticle.objects.select_related("author"),
+                )
+            )
             serializer = ArticleSerializer(articles, many=True)
         return Response(serializer.data)
 
@@ -64,14 +73,23 @@ class ArticleAPIView(APIView):
             for author_data in authors_data:
                 # Ensure each author_data is a dictionary
                 # create  author data with alrready existing article
-                author_data["article"] = article.id  # if ForeignKey expects ID
+                # author_data["article"] = article.id  # if ForeignKey expects ID
                 # save the data
                 author_serializer = createAuthorSerializer(data=author_data)
                 if author_serializer.is_valid():
                     author_serializer.save()
-                else:
-                    return Response(author_serializer.errors, status=400)
-
+                    author_article_combined_data = {}
+                    author_article_combined_data["author"] = (
+                        author_serializer.instance.id
+                    )
+                    author_article_combined_data["article"] = article.id
+                    article_to_author_serializer = createAuthorToArticleSerializer(
+                        data=author_article_combined_data
+                    )
+                    if article_to_author_serializer.is_valid():
+                        article_to_author_serializer.save()
+                    else:
+                        return Response(author_serializer.errors, status=400)
             return Response(article_serializer.data, status=201)
         else:
             return Response(article_serializer.errors, status=400)

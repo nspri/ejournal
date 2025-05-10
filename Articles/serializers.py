@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Article, Author
+from .models import *
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -15,11 +15,19 @@ class UserSerializer(serializers.ModelSerializer):
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
-        fields = ["firstname", "lastname", "title", "contribution_date"]
+        fields = ["firstname", "lastname", "title", "phone_number", "email"]
+
+
+class AuthorToArticleSerializer(serializers.ModelSerializer):
+    author = AuthorSerializer(read_only=True)
+
+    class Meta:
+        model = authorToarticle
+        fields = ["author", "contribution_date"]
 
 
 class ArticleSerializer(serializers.ModelSerializer):
-    authors = AuthorSerializer(many=True, read_only=True)
+    authors = AuthorToArticleSerializer(many=True, read_only=True)
     submitted_by = UserSerializer(read_only=True)  # Now it's writable
     reviewed_by = UserSerializer(read_only=True)
 
@@ -56,10 +64,22 @@ class ArticleSerializer(serializers.ModelSerializer):
         return instance
 
 
-class createAuthorSerializer(serializers.ModelSerializer):
+class createAuthorToArticleSerializer(serializers.ModelSerializer):
+    author = serializers.PrimaryKeyRelatedField(queryset=Author.objects.all())
     article = serializers.PrimaryKeyRelatedField(queryset=Article.objects.all())
-    # article = ArticleSerializer()
 
     class Meta:
+        model = authorToarticle
+        fields = ["author", "article", "contribution_date"]
+
+
+class createAuthorSerializer(serializers.ModelSerializer):
+    # article = serializers.PrimaryKeyRelatedField(queryset=Article.objects.all())
+    # article = ArticleSerializer()
+
+    # class Meta:
+    #    model = Author
+    #    fields = ["firstname", "lastname", "title", "article", "contribution_date"]
+    class Meta:
         model = Author
-        fields = ["firstname", "lastname", "title", "article", "contribution_date"]
+        fields = ["firstname", "lastname", "title", "phone_number", "email"]

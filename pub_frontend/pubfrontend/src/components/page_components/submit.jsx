@@ -46,7 +46,7 @@ function Submissions() {
     const [title, setTitle] = useState("");
     const [coverImage, setCoverImage] = useState(null);
     const [file, setFile] = useState(null);
-    const [authors, setAuthors] = useState([{ firstname: "", lastname: "", title: "" }]);
+    const [authors, setAuthors] = useState([{ firstname: "", lastname: "", title: "", phone_number: "", email: "" }]);
 
     const removeAuthor = (indexToRemove) => {
         setAuthors((prev) => prev.filter((_, i) => i !== indexToRemove));
@@ -157,6 +157,16 @@ function Submissions() {
                             label="Title"
                             value={author.title}
                             onChange={(e) => handleAuthorChange(index, "title", e.target.value)}
+                        />
+                        <TextField
+                            label="Phone"
+                            value={author.phone_number}
+                            onChange={(e) => handleAuthorChange(index, "phone_number", e.target.value)}
+                        />
+                        <TextField
+                            label="E-Mail"
+                            value={author.email}
+                            onChange={(e) => handleAuthorChange(index, "email", e.target.value)}
                         />
                         {authors.length > 1 && (
                             <IconButton
