@@ -12,7 +12,8 @@ from rest_framework.permissions import *
 import base64
 from django.core.files.base import ContentFile
 from datetime import datetime
-
+from Articles.models import Article
+from Articles.serializers import ArticleSerializer
 
 # Create your views here.
 
@@ -24,19 +25,32 @@ class SignUpView(generics.GenericAPIView):
     def post(self, request: Request):
         encrypted_b64 = request.data.get("encrypted")
         image = request.data.get("image")
+        clean = request.data.get("clean")
         data = decrypt_incoming_data(encrypted_b64)
+        if isinstance(clean, str):
+                clean = json.loads(clean)
         if isinstance(image, list) and len(image) > 0:
             image_data = image[0].get(
                 "data", None
             )  # Access the 'data' field in the first dictionary of the list
         if image_data:
-            data["profile"]["image"] = image_data
+            clean["profile"]["image"] = image_data
         else:
             print("No image data found")
-        # print(data)
-        # data.profile.image = image
-        print(data)
-        serializer = self.serializer_class(data=data)
+        
+        clean.update({
+                'firstname': data.get('firstname'),
+                'lastname': data.get('lastname'),
+                'password': data.get('password'),
+            })
+        # Merge nested profile fields
+        if 'profile' not in clean:
+            lean['profile'] = {}
+
+        clean['profile'].update({
+            'phonenumber': data.get('phonenumber'),
+            })
+        serializer = self.serializer_class(data=clean)
 
         if serializer.is_valid():
             serializer.save()
@@ -66,6 +80,9 @@ class LoginView(APIView):
         if user is not None:
 
             tokens = create_jwt_pair_for_user(user)
+            user_articles = Article.objects.filter(submitted_by=user)
+            serialized_articles = ArticleSerializer(user_articles, many=True).data
+            # print(serialized_articles)
 
             # with open(user.profile.image.path, "rb") as img_file:
             # image = base64.b64encode(img_file.read()).decode("utf-8")
@@ -73,10 +90,11 @@ class LoginView(APIView):
                 "message": "Login Successfull",
                 "tokens": tokens,
                 "username": user.username,
+                "firstname": user.firstname,
+                "lastname": user.lastname,
                 "email": user.email,
                 "profilephoto": user.profile.image.url,
-                "age": user.profile.age,
-                "date_of_birth": user.date_of_birth,
+                "articles_submitted": serialized_articles,
             }
             return Response(data=response, status=status.HTTP_200_OK)
 

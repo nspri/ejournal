@@ -14,12 +14,13 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { AuthContext } from "../../providers/AuthContext";
 //import { AuthProvider } from "../providers/AuthContext";
 import LogoutButton from "../auth_components/logout";
+import Dashboard from "../page_components/Dashoard";
 
 
 const navItems = [
   { label: "Home", path: "/" },
   { label: "About", path: "/about" },
-  { label: "All Post", path: "/post" },
+  { label: "Dashboard", path: "/dashboard" },
   { label: "Podcast", path: "/podcast" },
   //{ label: "Article Categories", path: "/article-categories" },
 ];

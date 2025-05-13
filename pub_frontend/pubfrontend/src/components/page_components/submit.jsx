@@ -41,16 +41,19 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 function Submissions() {
+    const articleToUpdate = JSON.parse(sessionStorage.getItem("articleToUpdate"));
+    const isUpdate = !!articleToUpdate;
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const [title, setTitle] = useState("");
-    const [coverImage, setCoverImage] = useState(null);
-    const [file, setFile] = useState(null);
-    const [authors, setAuthors] = useState([{ firstname: "", lastname: "", title: "", phone_number: "", email: "" }]);
 
     const removeAuthor = (indexToRemove) => {
         setAuthors((prev) => prev.filter((_, i) => i !== indexToRemove));
     };
+    const method = isUpdate ? "PUT" : "POST";
+    const url = isUpdate
+        ? `${dev_API_BASE_URL}/articles/articles/${articleToUpdate.id}/`
+        : `${dev_API_BASE_URL}/articles/articles/`;
+
 
     const handleAuthorChange = (index, field, value) => {
         const newAuthors = [...authors];
@@ -61,6 +64,23 @@ function Submissions() {
     const addAuthor = () => {
         setAuthors([...authors, { firstname: "", lastname: "", title: "" }]);
     };
+    if (articleToUpdate) {
+        const [title, setTitle] = useState(articleToUpdate.title || "");
+        const [coverImage, setCoverImage] = useState(articleToUpdate.coverImage || "");
+        //const [title, setTitle] = useState(articleToUpdate.title || "");
+        const [file, setFile] = useState(articleToUpdate.file || "");
+
+
+        //setTitle(articleToUpdate.title || "");
+        //etAuthors(articleToUpdate.authors || []);
+        // You don't set coverImage/file here — user should reupload if needed
+    } else {
+        const [title, setTitle] = useState("");
+        const [coverImage, setCoverImage] = useState(null);
+        const [file, setFile] = useState(null);
+        const [authors, setAuthors] = useState([{ firstname: "", lastname: "", title: "", phone_number: "", email: "" }]);
+
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -73,8 +93,8 @@ function Submissions() {
         //const csrftoken = getCookie("csrftoken");
         // console.log(formData)
         try {
-            const response = await fetch(`${dev_API_BASE_URL}${"/articles/articles/"}`, {
-                method: "POST",
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     //"X-CSRFToken": csrftoken,
                     //'Content-Type': 'application/json',
@@ -85,6 +105,8 @@ function Submissions() {
             const result = await response.json();
             if (response.status == 201) {
                 console.log("Upload success:", result);
+                sessionStorage.removeItem("articleToUpdate");
+                sessionStorage.removeItem("articleFormMethod");
                 navigate("/");
             } else {
                 setError(result.error || "An error occurred while uploading.");
@@ -97,6 +119,14 @@ function Submissions() {
 
     return (
         <StyledPaper elevation={15}>
+            {articleToUpdate && (
+                <Chip
+                    label="Editing Existing Article"
+                    color="info"
+                    style={{ marginBottom: 16 }}
+                />
+            )}
+
             <img src={logo} alt="Logo" style={{ width: 100, marginBottom: 16 }} />
             {error && (
                 <Chip

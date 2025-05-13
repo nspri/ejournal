@@ -9,7 +9,7 @@ import Home from './components/page_components/Home';
 import { Box } from '@mui/material';
 import Registration from './components/auth_components/Register';
 import Submissions from './components/page_components/submit';
-
+import Dashboard from './components/page_components/Dashoard';
 function App() {
   const [count, setCount] = useState(0)
 
@@ -22,6 +22,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Registration />} />
           <Route path="/submission" element={<Submissions />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/" element={<Home />} />
         </Routes>
         {/* <Routes>

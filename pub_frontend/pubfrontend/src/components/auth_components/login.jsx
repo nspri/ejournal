@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../../providers/AuthContext';
 import { loginUser } from '../api/api_services';
+import { generateArticlePreviews } from '../utility/article_preview_generator';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -59,14 +60,17 @@ const Login = () => {
       const userProfile = {
         username: response.username,
         email: response.email,
-        age: response.age,
-        dateOfBirth: response.date_of_birth,
-        profilePhoto: response.profilephoto,  // Base64 encoded image
-      };
-
+        firstname: response.firstname,
+        lastname: response.lastname,
+        profilePhoto: response.profilephoto,
+        articles_submitted: response.articles_submitted  // Base64 encoded image
+      }
+      await generateArticlePreviews(userProfile.articles_submitted);
       // Convert the object to a JSON string and store it
       localStorage.setItem('userProfile', JSON.stringify(userProfile));
-      const storedUserProfile = JSON.parse(localStorage.getItem('userProfile'));
+
+      // to get it back when you need it type the followiung 
+      //const storedUserProfile = JSON.parse(localStorage.getItem('userProfile'));
       //if (storedUserProfile) {
       //    console.log(storedUserProfile.username);  // Access the data
       //    console.log(storedUserProfile.email);

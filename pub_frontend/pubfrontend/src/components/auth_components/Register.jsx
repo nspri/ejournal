@@ -37,6 +37,8 @@ const Registration = () => {
   const [formData, setFormData] = useState({
     email: "",
     username: "",
+    firstname: "",
+    lastname: "",
     dateOfBirth: "",
     title: "",
     age: "",
@@ -80,6 +82,8 @@ const Registration = () => {
       data = {
         email: formData.email,
         username: formData.username,
+        firstname: formData.firstname,
+        lastname: formData.lastname,
         password: formData.password,
         profile: {
           phonenumber: formData.phonenumber,
@@ -109,7 +113,7 @@ const Registration = () => {
           console.error("Failed to submit:", result.data);
           let errorMessage = '';
           alert(`Submission Failed:\n${errorMessage}`);
-          navigate("/registration");
+          navigate("/register");
           // Handle error (show an error message, etc.)
         }
       } catch (error) {
@@ -225,6 +229,30 @@ const Registration = () => {
                   required
                 />
               </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="firstname"
+                  variant="outlined"
+                  name="firstname"
+                  value={formData.firstname}
+                  onChange={handleChange}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="lastname"
+                  variant="outlined"
+                  name="lastname"
+                  value={formData.lastname}
+                  onChange={handleChange}
+                  required
+                />
+              </Grid>
+
+
               <Grid item xs={12}>
                 <TextField
                   fullWidth

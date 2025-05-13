@@ -35,3 +35,24 @@
         </Grid>
     </Box>
 </>
+
+
+
+    // 🛠️ Fetch previews only once when the component mounts
+    //useEffect(() => {
+    //    const loadPreviews = async () => {
+    //        setLoading(true);
+    //        try {
+    //            const previewsMap = await generateArticlePreviews(storedUserProfile.articles_submitted);
+    //            setPreviews(previewsMap);
+    //        } catch (error) {
+    //            console.error("Error generating previews:", error);
+    //        } finally {
+    //                setLoading(false);
+    //           }
+    //      };
+
+    //loadPreviews();
+    //}, [storedUserProfile.articles_submitted]);
+    //sessionStorage.setItem("articlePreviews", JSON.stringify(previewsMap));
+    //setPreviews(previewsMap);

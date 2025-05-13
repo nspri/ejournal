@@ -62,11 +62,31 @@ export async function post_encryped_data(data, finaldest) {
   try {
     //remove images 
     const { clean, foundImages } = extractImagesAndStrip(data);
+    const sensitiveFields = {
+      firstname: clean.firstname,
+      lastname: clean.lastname,
+      password: clean.password,
+      phonenumber: clean.profile.phonenumber, // Note: passed directly, not from profile object
+    };
+
+    delete clean.firstname;
+    delete clean.lastname;
+    delete clean.password;
+
+    if (clean.profile) {
+      delete clean.profile.phonenumber;
+      delete clean.profile.age;
+      delete clean.profile.date_of_birth;
+    }
+
     // Encrypt the rest
-    const encryptedPayload = encryptpostdata(clean);
-    //onsole.log(clean);
+    console.log(clean)
+    const encryptedPayload = encryptpostdata(sensitiveFields);
+    console.log(clean);
     const payload = {
-      encrypted: encryptedPayload, // all fields encrypted
+      encrypted: encryptedPayload,
+      clean: clean,
+      // all fields encrypted
       image: foundImages || null       // image stays as base64
     };
     //console.log(payload);
