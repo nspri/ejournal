@@ -43,9 +43,15 @@ const StyledButton = styled(Button)(({ theme }) => ({
 function Submissions() {
     const articleToUpdate = JSON.parse(sessionStorage.getItem("articleToUpdate"));
     const isUpdate = !!articleToUpdate;
+    //console.log(articleToUpdate)
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-
+    const [title, setTitle] = useState(articleToUpdate?.title || "");
+    const [coverImage, setCoverImage] = useState(null); // Let user re-upload
+    const [file, setFile] = useState(null); // Same here
+    const [authors, setAuthors] = useState(
+        articleToUpdate?.authors || [{ firstname: "", lastname: "", title: "", phone_number: "", email: "" }]
+    );
     const removeAuthor = (indexToRemove) => {
         setAuthors((prev) => prev.filter((_, i) => i !== indexToRemove));
     };
@@ -53,7 +59,6 @@ function Submissions() {
     const url = isUpdate
         ? `${dev_API_BASE_URL}/articles/articles/${articleToUpdate.id}/`
         : `${dev_API_BASE_URL}/articles/articles/`;
-
 
     const handleAuthorChange = (index, field, value) => {
         const newAuthors = [...authors];
@@ -64,23 +69,6 @@ function Submissions() {
     const addAuthor = () => {
         setAuthors([...authors, { firstname: "", lastname: "", title: "" }]);
     };
-    if (articleToUpdate) {
-        const [title, setTitle] = useState(articleToUpdate.title || "");
-        const [coverImage, setCoverImage] = useState(articleToUpdate.coverImage || "");
-        //const [title, setTitle] = useState(articleToUpdate.title || "");
-        const [file, setFile] = useState(articleToUpdate.file || "");
-
-
-        //setTitle(articleToUpdate.title || "");
-        //etAuthors(articleToUpdate.authors || []);
-        // You don't set coverImage/file here — user should reupload if needed
-    } else {
-        const [title, setTitle] = useState("");
-        const [coverImage, setCoverImage] = useState(null);
-        const [file, setFile] = useState(null);
-        const [authors, setAuthors] = useState([{ firstname: "", lastname: "", title: "", phone_number: "", email: "" }]);
-
-    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -96,19 +84,23 @@ function Submissions() {
             const response = await fetch(url, {
                 method: method,
                 headers: {
-                    //"X-CSRFToken": csrftoken,
-                    //'Content-Type': 'application/json',
                     'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
                 },
                 body: formData,
             });
             const result = await response.json();
+            console.log(result)
             if (response.status == 201) {
                 console.log("Upload success:", result);
                 sessionStorage.removeItem("articleToUpdate");
                 sessionStorage.removeItem("articleFormMethod");
                 navigate("/");
-            } else {
+            } else if (response.status === 401 || response.status === 403) {
+                setError("You are not authorized. Please log in again.");
+                // Optional: redirect to login page
+                navigate("/login");
+            }
+            else {
                 setError(result.error || "An error occurred while uploading.");
             }
         } catch (error) {
@@ -167,49 +159,53 @@ function Submissions() {
                     margin="normal"
                 />
 
+
                 {/* Author Inputs */}
                 <Box justifyContent="center" alignItems="center">
                     <Typography variant="h6">Authors</Typography>
                 </Box>
-                {authors.map((author, index) => (
-                    <Box key={index} justifyContent="center" alignItems="center" display="flex" gap={2} flexWrap="wrap" mb={2}>
-                        <TextField
-                            label="First Name"
-                            value={author.firstname}
-                            onChange={(e) => handleAuthorChange(index, "firstname", e.target.value)}
-                        />
-                        <TextField
-                            label="Last Name"
-                            value={author.lastname}
-                            onChange={(e) => handleAuthorChange(index, "lastname", e.target.value)}
-                        />
-                        <TextField
-                            label="Title"
-                            value={author.title}
-                            onChange={(e) => handleAuthorChange(index, "title", e.target.value)}
-                        />
-                        <TextField
-                            label="Phone"
-                            value={author.phone_number}
-                            onChange={(e) => handleAuthorChange(index, "phone_number", e.target.value)}
-                        />
-                        <TextField
-                            label="E-Mail"
-                            value={author.email}
-                            onChange={(e) => handleAuthorChange(index, "email", e.target.value)}
-                        />
-                        {authors.length > 1 && (
-                            <IconButton
-                                color="error"
-                                onClick={() => removeAuthor(index)}
-                                aria-label="delete"
-                            >
-                                <DeleteIcon />
-                            </IconButton>
-                        )}
+                {authors.map((entry, i) => {
+                    const a = entry.author || entry; // Fallback if nested or flat
+                    return (
+                        <Box key={i} justifyContent="center" alignItems="center" display="flex" gap={2} flexWrap="wrap" mb={2}>
+                            <TextField
+                                label="First Name"
+                                value={a.firstname}
+                                onChange={(e) => handleAuthorChange(i, "firstname", e.target.value)}
+                            />
+                            <TextField
+                                label="Last Name"
+                                value={a.lastname}
+                                onChange={(e) => handleAuthorChange(i, "lastname", e.target.value)}
+                            />
+                            <TextField
+                                label="Title"
+                                value={a.title}
+                                onChange={(e) => handleAuthorChange(i, "title", e.target.value)}
+                            />
+                            <TextField
+                                label="Phone"
+                                value={a.phone_number}
+                                onChange={(e) => handleAuthorChange(i, "phone_number", e.target.value)}
+                            />
+                            <TextField
+                                label="E-Mail"
+                                value={a.email}
+                                onChange={(e) => handleAuthorChange(i, "email", e.target.value)}
+                            />
+                            {authors.length > 1 && (
+                                <IconButton
+                                    color="error"
+                                    onClick={() => removeAuthor(i)}
+                                    aria-label="delete"
+                                >
+                                    <DeleteIcon />
+                                </IconButton>
+                            )}
 
-                    </Box>
-                ))}
+                        </Box>
+                    )
+                })},
                 <Button
                     variant="outlined"
                     startIcon={<AddIcon />}

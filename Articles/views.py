@@ -71,10 +71,6 @@ class ArticleAPIView(APIView):
 
             # Now loop through authors_data, which should be a list of dictionaries
             for author_data in authors_data:
-                # Ensure each author_data is a dictionary
-                # create  author data with alrready existing article
-                # author_data["article"] = article.id  # if ForeignKey expects ID
-                # save the data
                 author_serializer = createAuthorSerializer(data=author_data)
                 if author_serializer.is_valid():
                     author_serializer.save()
@@ -96,11 +92,32 @@ class ArticleAPIView(APIView):
 
     def put(self, request, pk):
         article = get_object_or_404(Article, pk=pk)
-        serializer = ArticleSerializer(article, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        print(request.data)
+        article.title = request.data.get("title")
+        article.file = request.data.get("file")
+        article.cover_image =request.data.get("cover_image")
+        article.save()
+        articletoauthor = authorToarticle.objects.filter(article=article).delete()
+        authors_data = request.data.get(
+            "authors", "[]"
+        ) 
+        authors_data = json.loads(authors_data)
+        print(authors_data)
+        for author_data in authors_data:
+            a = author_data.get("author", author_data) 
+            #print(a["firstname"])
+            new_author = Author.objects.create(firstname=a["firstname"],lastname=a["lastname"],phone_number=a["phone_number"],email=a["email"],title=a["title"])
+            print(new_author)
+            authorToarticle.objects.create(article = article,author = new_author)
+            #Author.objects.create(firstname=author_data)
+            
+
+
+        serializer = ArticleSerializer(article)
+            # serializer.save()
+        print(serializer.data)
+        return Response(serializer.data,status=201)
+        #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Create your views here.

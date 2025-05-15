@@ -120,6 +120,17 @@ export default function Dashboard() {
                                             <Article sx={{ mr: 1 }} />
                                             {article.title}
                                         </Typography>
+                                        {/* Authors */}
+                                        {article.authors && article.authors.length > 0 && (
+                                            <Box sx={{ mb: 1 }}>
+                                                <Typography variant="subtitle2">Authors:</Typography>
+                                                {article.authors.map((a, i) => (
+                                                    <Typography key={i} variant="body2" color="textSecondary">
+                                                        {a.author.title} {a.author.firstname} {a.author.lastname} — {a.author.email}
+                                                    </Typography>
+                                                ))}
+                                            </Box>
+                                        )}
                                         <Box justifyContent="center">
                                             <Chip
                                                 label={article.published ? 'Published' : 'Unpublished'}

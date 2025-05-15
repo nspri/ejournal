@@ -9,7 +9,7 @@ import Home from './components/page_components/Home';
 import { Box } from '@mui/material';
 import Registration from './components/auth_components/Register';
 import Submissions from './components/page_components/submit';
-import Dashboard from './components/page_components/Dashoard';
+import Dashboard from './components/page_components/Dashboard';
 function App() {
   const [count, setCount] = useState(0)
 

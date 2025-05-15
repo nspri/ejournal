@@ -14,20 +14,70 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { AuthContext } from "../../providers/AuthContext";
 //import { AuthProvider } from "../providers/AuthContext";
 import LogoutButton from "../auth_components/logout";
-import Dashboard from "../page_components/Dashoard";
+import Dashboard from "../page_components/Dashboard";
+import DropdownMenu from "./dropdown";
+import { label } from "framer-motion/client";
 
 
 const navItems = [
   { label: "Home", path: "/" },
   { label: "About", path: "/about" },
   { label: "Dashboard", path: "/dashboard" },
-  { label: "Podcast", path: "/podcast" },
+  { label: "Editorial Team", path: "/edit_team" },
+  { label: "ISSUES", path: "/edit_team" },
+  { label: "Ethics", path: "/ethics" },
+  { label: "Policies & Guidelines", path: "/p&g" },
+  //{ label: ""}
   //{ label: "Article Categories", path: "/article-categories" },
 ];
+const aboutdropdowm = [
+  { label: "About NIJOPHAR", path: "/about_nijophar" },
+  { label: "About NSPRI", path: "/about_nspri" },
+
+]
+
+const ethicsDropdown = [
+  { label: "Duties of Publisher", path: "/duties-of-publisher" },
+  { label: "Publication Ethics Policy", path: "/publication-ethics-policy" },
+  { label: "Duties of Editors", path: "/duties-of-editors" },
+  { label: "Duties of Authors", path: "/duties-of-authors" },
+  { label: "Duties of Reviewers", path: "/duties-of-reviewers" },
+  { label: "Duties of Sponsors", path: "/duties-of-sponsors" },
+  { label: "Copyright Issues", path: "/copyright-issues" },
+  { label: "Handling Publication Malpractice", path: "/handling-publication-malpractice" },
+];
+
+const policydropdown = [
+  { label: "Peer Review Policy", path: "/peer-review-policy" },
+  { label: "Editorial Policies", path: "/editorial-policies" },
+  { label: "Reviewer's Guidelines", path: "/reviewer-guidelines" },
+  { label: "Digital Archiving Policy", path: "/digital-archiving-policy" },
+  { label: "Advertising & Marketing Policies", path: "/advertising-marketing-policies" },
+];
+
+const issuesdropdown = [
+  { label: "CURRENT", path: "/current" },
+  { label: "ARCHIVE", path: "/archive" },
+]
+const contributionsdropdown = [
+  { label: "Ethics", path: "/ethic" },
+  { label: "Journal Template", path: "/jt" },
+]
+
+let drop_downlabels = [
+  { label: "About", items: aboutdropdowm },
+  { label: "Policies & Guidelines", items: policydropdown },
+  { label: "ISSUES", items: issuesdropdown },
+  { label: "Ethics", items: ethicsDropdown },
+
+
+]
 const navAccess = [
   { label: "Login", path: "/login" },
   { label: "Register", path: "/register" }
 ]
+
+
 const articleCategories = [
   { label: 'Agriculture', path: 'agriculture' },
   { label: 'Health', path: 'health' },
@@ -44,6 +94,9 @@ const loggedIn = false; // <-- Replace this with actual login check (e.g. from c
 function Navbar() {
   const { isLoggedIn, logout } = useContext(AuthContext); // Access isLoggedIn and logout
   const fullNav = isLoggedIn ? navItems : [...navItems, ...navAccess];
+  const dropdownMap = Object.fromEntries(
+    drop_downlabels.map(({ label, items }) => [label, items])
+  );
   //const { isLoggedIn, setIsLoggedIn} = useState(false)
   //let isLoggedIn = false;
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -86,7 +139,7 @@ function Navbar() {
           {/* Website Name on the Left */}
           <Stack direction="row" spacing={2}>
             <Typography textAlign="left" variant="h6" component="div">
-              NSPRI Publications
+              NIJOPHAR
             </Typography>
             <Box>
               <Box
@@ -101,23 +154,32 @@ function Navbar() {
           {/* Navigation Items on the Right */}
           <Box sx={{ ml: 'auto', display: { xs: "none", md: "flex" } }}>
             {fullNav.map((item, index) => (
-              <Button
-                key={index}
-                color="inherit"
-                component={Link}
-                to={item.path}
-                onClick={handleClick}
-                sx={{
-                  color: location.pathname === item.path ? 'black' : 'inherit', // Highlight if active
-                  textDecoration: location.pathname === item.path ? 'underline' : 'none', // Underline if active
-                  '&:hover': {
-                    color: 'black', // Change this to the desired hover color
-                    textDecoration: 'underline',
-                  },
-                }}
-              >
-                {item.label}
-              </Button>
+              dropdownMap[item.label] ? (
+                <DropdownMenu
+                  location
+                  key={index}
+                  label={item.label}
+                  menuItems={dropdownMap[item.label]} // Pass the matched items
+                />
+              ) : (
+                <Button
+                  key={index}
+                  color="inherit"
+                  component={Link}
+                  to={item.path}
+                  onClick={handleClick}
+                  sx={{
+                    color: location.pathname === item.path ? 'black' : 'inherit',
+                    textDecoration: location.pathname === item.path ? 'underline' : 'none',
+                    '&:hover': {
+                      color: 'black',
+                      textDecoration: 'underline',
+                    },
+                  }}
+                >
+                  {item.label}
+                </Button>
+              )
             ))}
             <Button color="inherit" onClick={handleMenuOpen} onMouseEnter={handleMenuOpen} sx={{
               '&:hover': {

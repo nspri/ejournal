@@ -34,25 +34,44 @@
             ))}
         </Grid>
     </Box>
+    <Button
+        key={index}
+        color="inherit"
+        component={Link}
+        to={item.path}
+        onClick={handleClick}
+        sx={{
+            color: location.pathname === item.path ? 'black' : 'inherit', // Highlight if active
+            textDecoration: location.pathname === item.path ? 'underline' : 'none', // Underline if active
+            '&:hover': {
+                color: 'black', // Change this to the desired hover color
+                textDecoration: 'underline',
+            },
+        }}
+    >
+        {item.label}
+    </Button>
 </>
 
 
 
-    // 🛠️ Fetch previews only once when the component mounts
-    //useEffect(() => {
-    //    const loadPreviews = async () => {
-    //        setLoading(true);
-    //        try {
-    //            const previewsMap = await generateArticlePreviews(storedUserProfile.articles_submitted);
-    //            setPreviews(previewsMap);
-    //        } catch (error) {
-    //            console.error("Error generating previews:", error);
-    //        } finally {
-    //                setLoading(false);
-    //           }
-    //      };
 
-    //loadPreviews();
-    //}, [storedUserProfile.articles_submitted]);
-    //sessionStorage.setItem("articlePreviews", JSON.stringify(previewsMap));
-    //setPreviews(previewsMap);
+
+// 🛠️ Fetch previews only once when the component mounts
+//useEffect(() => {
+//    const loadPreviews = async () => {
+//        setLoading(true);
+//        try {
+//            const previewsMap = await generateArticlePreviews(storedUserProfile.articles_submitted);
+//            setPreviews(previewsMap);
+//        } catch (error) {
+//            console.error("Error generating previews:", error);
+//        } finally {
+//                setLoading(false);
+//           }
+//      };
+
+//loadPreviews();
+//}, [storedUserProfile.articles_submitted]);
+//sessionStorage.setItem("articlePreviews", JSON.stringify(previewsMap));
+//setPreviews(previewsMap);

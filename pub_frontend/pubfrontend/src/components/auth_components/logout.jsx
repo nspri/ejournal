@@ -14,6 +14,7 @@ const LogoutButton = () => {
             // Clear session storage, localStorage or any other session data
             //localStorage.removeItem('token'); // If you're using localStorage to store tokens
             sessionStorage.clear(); // If session data is stored in sessionStorage
+            localStorage.clear();
             logout();
 
             // Optionally redirect to login or homepage

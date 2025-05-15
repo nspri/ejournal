@@ -55,9 +55,9 @@ class ArticleSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user = self.context["request"].user
         # user_data = validated_data.pop("submitted_by", None)
-        instance.updated_by = (
-            user  # Update the `updated_by` field with the current user
-        )
+        #instance.updated_by = (
+        #    user  # Update the `updated_by` field with the current user
+        #)
 
         # Save the changes to the article
         instance.save()
