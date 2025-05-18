@@ -9,14 +9,36 @@ from django.db.models import Prefetch
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .serializers import *
 import json
-
+import bleach
 # views.py
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.csrf import csrf_exempt
+from Articles.html_converters import extract_file_content
 
 
 # --- Article API View ---
+class Article_detail_APIView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = ArticleSerializer
+
+    def get(self, request, pk=None):
+        print(pk)
+        if pk:
+            article = get_object_or_404(Article, pk=pk)
+            html = extract_file_content(article.file)
+            print(html)
+            safe_html = bleach.clean(
+                html,
+                tags=[
+                    "p", "br", "strong", "em", "ul", "ol", "li", "h1", "h2", "h3", "h4", "h5", "blockquote", "a"
+                ],
+                attributes={"a": ["href"]},
+                strip=True,
+            )
+
+            return JsonResponse({"html": safe_html},status=200)
+
 
 
 class ArticleAPIView(APIView):
@@ -110,9 +132,6 @@ class ArticleAPIView(APIView):
             print(new_author)
             authorToarticle.objects.create(article = article,author = new_author)
             #Author.objects.create(firstname=author_data)
-            
-
-
         serializer = ArticleSerializer(article)
             # serializer.save()
         print(serializer.data)

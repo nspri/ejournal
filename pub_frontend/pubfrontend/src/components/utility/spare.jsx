@@ -1,9 +1,25 @@
 
+const handleUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        //const res = await axios.post("/api/upload-and-extract", formData);
+
+    } catch (err) {
+        console.error("Upload error:", err);
+        setError("Failed to extract content. Please try a valid .docx or .pdf file.");
+    }
+};
 
 <>
     <Box height={80}>
 
     </Box>
+
 
     <Box
         sx={{
@@ -34,6 +50,11 @@
             ))}
         </Grid>
     </Box>
+    <Typography variant="h5" mb={2}>Upload a Document</Typography>
+    <Button variant="contained" component="label">
+        Choose File
+        <input type="file" hidden onChange={handleUpload} />
+    </Button>
     <Button
         key={index}
         color="inherit"

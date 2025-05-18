@@ -104,3 +104,16 @@ export async function post_encryped_data(data, finaldest) {
   }
 }
 
+export async function get_article_html(finaldest) {
+  const response = await fetch(`${dev_API_BASE_URL}/${finaldest}`)
+  if (response.status === 200) {
+    const data = await response.json();
+    //console.log(data)
+    sessionStorage.setItem("html_content", data.html);
+    console.log(data)
+    return data
+  } else {
+    return response
+  }
+
+}

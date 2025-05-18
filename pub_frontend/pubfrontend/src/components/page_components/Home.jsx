@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import React, { useContext, useEffect } from 'react';
 import {
   Box,
@@ -15,7 +16,7 @@ import { Link as RouterLink } from 'react-router-dom';
 
 import { UserContext } from '../../providers/Usercontext';
 import { dev_API_BASE_URL } from '../api/api_services';
-import { useNavigate } from "react-router-dom";
+import { get_article_html } from '../api/api_services';
 
 
 const categories = [
@@ -33,6 +34,7 @@ const Home = () => {
   const StyledButton = styled(Button)(({ theme }) => ({
     margin: theme.spacing(3, 0, 2),
   }));
+  const navigate = useNavigate();
   console.log(articleData)
   useEffect(() => {
     const fetchData = async () => {
@@ -47,6 +49,11 @@ const Home = () => {
 
     fetchData();
   }, []);
+  const handlereadarticle = async (articleId) => {
+    let final_destination = `articles/article_detail/${articleId}/`
+    await get_article_html(final_destination);
+    navigate("/fileviewer");
+  }
 
   return (
     <Box>
@@ -68,7 +75,7 @@ const Home = () => {
           variant="contained"
           color="primary"
           component={RouterLink}
-          
+
           to="/submission"
         >
           Publish with us
@@ -117,10 +124,11 @@ const Home = () => {
                 </Typography>
                 <Box mt={2}>
                   <Link
-                    component={RouterLink}
-                    to={`/post/${item.id}`}
+                    //component={RouterLink}
+                    //to={`/post/${item.id}`}
                     variant="body2"
-                    sx={{ textDecoration: 'none' }}
+                    //sx={{ textDecoration: 'none' }}
+                    onClick={() => handlereadarticle(item.id)}
                   >
                     Read More
                   </Link>

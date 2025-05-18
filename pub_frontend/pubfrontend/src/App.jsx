@@ -10,6 +10,7 @@ import { Box } from '@mui/material';
 import Registration from './components/auth_components/Register';
 import Submissions from './components/page_components/submit';
 import Dashboard from './components/page_components/Dashboard';
+import FileViewer from './components/page_components/view_article';
 function App() {
   const [count, setCount] = useState(0)
 
@@ -24,6 +25,7 @@ function App() {
           <Route path="/submission" element={<Submissions />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/" element={<Home />} />
+          <Route path="/fileviewer" element={<FileViewer />} />
         </Routes>
         {/* <Routes>
         <Route path="/post" element={<Post />} />
