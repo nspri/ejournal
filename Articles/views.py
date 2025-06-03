@@ -46,6 +46,7 @@ class ArticleAPIView(APIView):
     serializer_class = ArticleSerializer
 
     def get(self, request, pk=None):
+
         if pk:
             # article = get_object_or_404(Article, pk=pk)
             # authors = Author.objects.filter(article=article)
@@ -56,19 +57,20 @@ class ArticleAPIView(APIView):
                 )
             )
             for article in articles:
-                print(article.title)
+                #print(article.title)
                 for author in article.authors.all():
                     print(f"- {author.firstname} {author.lastname}")
             # author_serializer = AuthorSerializer(authors, many=True)
             serializer = ArticleSerializer(article)
         else:
             # articles = Article.objects.all()
-            articles = Article.objects.prefetch_related(
+            articles = Article.objects.filter(published=True,reviewed=True).prefetch_related(
                 Prefetch(
                     "authors",  # related_name from authorToarticle
                     queryset=authorToarticle.objects.select_related("author"),
                 )
             )
+            print(articles)
             serializer = ArticleSerializer(articles, many=True)
         return Response(serializer.data)
 
@@ -138,5 +140,36 @@ class ArticleAPIView(APIView):
         return Response(serializer.data,status=201)
         #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# to send articles that are to be reviews to teh  frontend 
+class get_Article_to_review_APIView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = ArticleSerializer
 
+    def get(self, request, pk=None):
+        if pk:
+            # article = get_object_or_404(Article, pk=pk)
+            # authors = Author.objects.filter(article=article)
+            articles = Article.objects.filter(published=False,reviewed=False).prefetch_related(
+                Prefetch(
+                    "authors",  # related_name from authorToarticle
+                    queryset=authorToarticle.objects.select_related("author"),
+                )
+            )
+            for article in articles:
+                print(article.title)
+                for author in article.authors.all():
+                    print(f"- {author.firstname} {author.lastname}")
+            # author_serializer = AuthorSerializer(authors, many=True)
+            serializer = ArticleSerializer(article)
+        else:
+            # articles = Article.objects.all()
+            articles = Article.objects.filter(published=False,reviewed=False).prefetch_related(
+                Prefetch(
+                    "authors",  # related_name from authorToarticle
+                    queryset=authorToarticle.objects.select_related("author"),
+                )
+            )
+            # print(articles)
+            serializer = ArticleSerializer(articles, many=True)
+        return Response(serializer.data)
 # Create your views here.

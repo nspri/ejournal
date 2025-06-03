@@ -91,7 +91,7 @@ const Home = () => {
         textAlign="center"
         sx={{ textDecoration: 'underline' }}
       >
-        Latest Post
+        Latest Publications
       </Typography>
 
       <Box height={50} />

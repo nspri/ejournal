@@ -55,6 +55,7 @@ const Login = () => {
       const refreshToken = response.tokens.refresh;
       sessionStorage.setItem('accessToken', accessToken);
       sessionStorage.setItem('refreshToken', refreshToken);
+      sessionStorage.setItem('is_staff', response.is_staff);
 
       // Store additional user information if needed
       const userProfile = {

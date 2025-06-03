@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Link as RouterLink } from 'react-router-dom';
 import React, { useEffect, useState } from "react";
 import {
     Box,
@@ -39,7 +40,11 @@ export default function Dashboard() {
     console.log(storedUserProfile.articles_submitted
 
     )
-
+    const handlereadarticle = async (articleId) => {
+        let final_destination = `articles/article_detail/${articleId}/`
+        await get_article_html(final_destination);
+        navigate("/fileviewer");
+    }
 
     // 🛠️ Fetch previews only once when the component mounts
     //useEffect(() => {
@@ -153,9 +158,10 @@ export default function Dashboard() {
                                         <Button
                                             variant="outlined"
                                             color="primary"
-                                            href={article.file}
+                                            //href={article.file}
                                             //target="_blank"
                                             fullWidth
+                                            onClick={() => handlereadarticle(item.id)}
                                         >
                                             Read Full Article
                                         </Button>
@@ -182,7 +188,7 @@ export default function Dashboard() {
 
                 {/* Submit New Article Button */}
                 <Box textAlign="center" mt={4}>
-                    <Button variant="contained" color="primary" size="large">
+                    <Button variant="contained" color="primary" size="large" component={RouterLink} to="/submission">
                         Submit New Article
                     </Button>
                 </Box>

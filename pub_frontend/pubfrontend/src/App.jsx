@@ -11,6 +11,7 @@ import Registration from './components/auth_components/Register';
 import Submissions from './components/page_components/submit';
 import Dashboard from './components/page_components/Dashboard';
 import FileViewer from './components/page_components/view_article';
+import ArticleReviewList from './components/page_components/article_review';
 function App() {
   const [count, setCount] = useState(0)
 
@@ -24,6 +25,7 @@ function App() {
           <Route path="/register" element={<Registration />} />
           <Route path="/submission" element={<Submissions />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/review" element={<ArticleReviewList />} />
           <Route path="/" element={<Home />} />
           <Route path="/fileviewer" element={<FileViewer />} />
         </Routes>

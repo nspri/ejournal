@@ -58,6 +58,15 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.user.username} Profile"
 
+class staff(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    title = models.CharField(default="", max_length=30)
+    image = models.ImageField(default="default.jpg", upload_to="profile_pics")
+    age = models.CharField(default="", max_length=30)
+    phonenumber = models.CharField(default="", max_length=30)
+
+    def __str__(self):
+        return f"{self.user.username} Profile"
 
 # Create your models here.
 

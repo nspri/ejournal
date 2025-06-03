@@ -95,7 +95,10 @@ class LoginView(APIView):
                 "email": user.email,
                 "profilephoto": user.profile.image.url,
                 "articles_submitted": serialized_articles,
+                #"is_staff": True,
+                "is_staff": user.is_staff,
             }
+            print(response)
             return Response(data=response, status=status.HTTP_200_OK)
 
         else:
@@ -151,9 +154,5 @@ class ProfileView(APIView):
             "message": "Successfull",
         }
         return Response(data=response, status=status.HTTP_200_OK)
-
-
-# Create your views here.
-
 
 # Create your views here.

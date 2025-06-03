@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext ,useEffect} from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -77,6 +77,10 @@ const navAccess = [
   { label: "Register", path: "/register" }
 ]
 
+const staffAccess = [
+  { label: "Review Articles", path: "/review" },
+]
+
 
 const articleCategories = [
   { label: 'Agriculture', path: 'agriculture' },
@@ -93,7 +97,25 @@ const loggedIn = false; // <-- Replace this with actual login check (e.g. from c
 
 function Navbar() {
   const { isLoggedIn, logout } = useContext(AuthContext); // Access isLoggedIn and logout
-  const fullNav = isLoggedIn ? navItems : [...navItems, ...navAccess];
+  //const fullNav = isLoggedIn ? navItems : [...navItems, ...navAccess];
+  const isStaff = sessionStorage.getItem('is_staff')
+  console.log(isStaff)
+  
+   const [fullNav, setFullNav] = useState([]);
+  useEffect(() => {
+    let updatedNav;
+
+    if (isLoggedIn) {
+      updatedNav = [...navItems];
+      if (isStaff === "true") {
+        updatedNav = [...updatedNav, ...staffAccess];
+      }
+    } else {
+      updatedNav = [...navItems, ...navAccess];
+    }
+
+    setFullNav(updatedNav);
+  }, [isLoggedIn, isStaff, navItems, staffAccess, navAccess]);
   const dropdownMap = Object.fromEntries(
     drop_downlabels.map(({ label, items }) => [label, items])
   );
@@ -134,10 +156,10 @@ function Navbar() {
   };
   return (
     <>
-      <AppBar position="fixed" color="primary"> {/* Changed position to "fixed" */}
+      <AppBar position="fixed" sx={{ backgroundColor: '#c0d3d9' }}> {/* Changed position to "fixed" */}
         <Toolbar>
           {/* Website Name on the Left */}
-          <Stack direction="row" spacing={2}>
+          <Stack direction="row" spacing={1 }>
             <Typography textAlign="left" variant="h6" component="div">
               NIJOPHAR
             </Typography>

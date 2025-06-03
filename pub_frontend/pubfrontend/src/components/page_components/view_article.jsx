@@ -1,94 +1,102 @@
-//import React, { useState } from "react";
-//import { Container, Paper, Typography, Button } from "@mui/material";
-import axios from "axios";
+import React from "react";
+import { Container, Paper } from "@mui/material";
 import DOMPurify from "dompurify";
-import React, { useState, useEffect, } from "react";
-import { createElement } from "react";
-import { jsx, jsxs, Fragment } from "react/jsx-runtime";
-
-import { Container, Paper, Typography, Button, Box } from "@mui/material";
 import { unified } from "unified";
 import rehypeParse from "rehype-parse";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeReact from "rehype-react";
+import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { cleanDocument } from "../utility/article2htmlconv";
 
-// Function to convert and sanitize HTML into React elements
+// Unified processor for HTML to React conversion
 const processor = unified()
     .use(rehypeParse, { fragment: true })
     .use(rehypeSanitize)
-    .use(rehypeReact, {
-        jsx, // ✅ use the new JSX runtime
-        jsxs,
-        Fragment,
-        // You can also add components if needed:
-        // components: { h1: CustomHeading }
-    });
+    .use(rehypeReact, { jsx, jsxs, Fragment });
 
 export default function FileViewer() {
-    //const [htmlContent, setHtmlContent] = useState("");
-    //const [error, setError] = useState(null);
     const saved = sessionStorage.getItem("html_content");
-    //console.log(saved)
-    const sanitized = DOMPurify.sanitize(saved);
-    let htmlContent = sanitized
-    //
+    const sanitized = DOMPurify.sanitize(saved || "");
     const cleanedHtml = cleanDocument(sanitized);
-    let htmlReactContent = processor.processSync(cleanedHtml).result;
-    console.log(cleanedHtml);
-    console.log(htmlReactContent)
-    //setHtmlContent(sanitized);
-    //setError(null);
+    const htmlReactContent = processor.processSync(cleanedHtml).result;
 
     return (
-        <Container maxWidth="md" sx={{ mt: 4 }}>
-
-
+        <Container maxWidth="md" sx={{ mt: 4, mb: 8 }}>
             {htmlReactContent && (
                 <Paper
-                    elevation={3}
                     sx={{
                         mt: 4,
-                        p: 3,
-                        maxHeight: "70vh",
+                        p: 4,
+                        maxHeight: "75vh",
                         overflowY: "auto",
-                        "& h1, & h2, & h3": {
+                        textAlign: "left",
+                        fontFamily: "'Inter', 'Segoe UI', sans-serif",
+                        fontSize: "1.05rem",
+                        color: "#333",
+                        backgroundColor: "#fff",
+                        borderRadius: "12px",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                        lineHeight: 1.75,
+
+                        // ✅ Headings underlined
+                        "& h1, & h2, & h3, & h4, & h5, & h6": {
                             fontWeight: "bold",
-                            mt: 3,
-                            mb: 2,
+                            textDecoration: "underline",
+                            marginTop: "1.5rem",
+                            marginBottom: "1rem",
                         },
+
+                        // ✅ Paragraph spacing
                         "& p": {
-                            mb: 2,
-                            lineHeight: 1.8,
+                            marginBottom: "1rem",
                         },
+
+                        // ✅ Lists
                         "& ul, & ol": {
-                            pl: 3,
-                            mb: 2,
+                            paddingLeft: "1.5rem",
+                            marginBottom: "1rem",
                         },
+
+                        // ✅ Links
                         "& a": {
-                            color: "blue",
+                            color: "#2563eb",
                             textDecoration: "underline",
                         },
+
+                        // ✅ Tables
                         "& table": {
                             width: "100%",
                             borderCollapse: "collapse",
-                            mb: 3,
+                            marginBottom: "1.5rem",
                         },
                         "& th, & td": {
                             border: "1px solid #ccc",
                             padding: "0.5rem",
                         },
+
+                        // ✅ Images
                         "& img": {
                             maxWidth: "100%",
                             margin: "1rem 0",
                         },
+
+                        // ✅ Code blocks
+                        "& pre": {
+                            backgroundColor: "#1e293b",
+                            color: "#fff",
+                            padding: "1rem",
+                            borderRadius: "6px",
+                            overflowX: "auto",
+                        },
+                        "& code": {
+                            backgroundColor: "#f3f4f6",
+                            padding: "0.2rem 0.4rem",
+                            borderRadius: "4px",
+                            fontSize: "0.95em",
+                        },
                     }}
                 >
-                    <div className="bg-white min-h-screen py-8 px-4 sm:px-8">
-                        <div className="prose prose-lg max-w-4xl mx-auto">
-                            {htmlReactContent}
-                        </div>
-                    </div>
+                    <div>{htmlReactContent}</div>
                 </Paper>
             )}
         </Container>
