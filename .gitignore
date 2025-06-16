@@ -46,3 +46,5 @@ Pipfile.lock
 # Ignore the settings for keeping private keys and certificates safe
 private_key.pem
 public_key.pem
+node_modules/
+node_modules/
