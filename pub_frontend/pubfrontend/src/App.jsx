@@ -10,8 +10,10 @@ import { Box } from '@mui/material';
 import Registration from './components/auth_components/Register';
 import Submissions from './components/page_components/submit';
 import Dashboard from './components/page_components/Dashboard';
-import FileViewer from './components/page_components/view_article';
+//import FileViewer from './components/page_components/view_article';
 import ArticleReviewList from './components/page_components/article_review';
+import ReviewPage from './components/page_components/reviewpage';
+import DocumentViewer from './components/page_components/view_article';
 function App() {
   const [count, setCount] = useState(0)
 
@@ -26,8 +28,9 @@ function App() {
           <Route path="/submission" element={<Submissions />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/review" element={<ArticleReviewList />} />
+          <Route path="/review/:articleId" element={<ReviewPage />} />
           <Route path="/" element={<Home />} />
-          <Route path="/fileviewer" element={<FileViewer />} />
+          <Route path="/fileviewer" element={<DocumentViewer />} />
         </Routes>
         {/* <Routes>
         <Route path="/post" element={<Post />} />

@@ -6,7 +6,7 @@ from .models import Article, Author
 from .serializers import ArticleSerializer, AuthorSerializer
 from django.shortcuts import get_object_or_404
 from django.db.models import Prefetch
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly,IsAuthenticated
 from .serializers import *
 import json
 import bleach
@@ -14,31 +14,47 @@ import bleach
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.request import Request
 from Articles.html_converters import extract_file_content
 
 
 # --- Article API View ---
-class Article_detail_APIView(APIView):
+class PublishArticleView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, *args, **kwargs):
+        article_id = request.data.get('article')
+
+        if not article_id:
+            return Response({"detail": "Article ID not provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        article_to_publish = get_object_or_404(Article, id=article_id)
+        print(article_to_publish.submitted_by)
+        print(request.user)
+
+        if article_to_publish.reviewed and request.user == article_to_publish.submitted_by:
+            if article_to_publish.published == True:
+                article_to_publish.published = False
+                pub_status = False
+            else:
+                article_to_publish.published = True
+                pub_status = True
+            article_to_publish.save()
+            return Response({"pubstatus": pub_status}, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "You are not authorized to publish this article or it hasn't been reviewed yet."}, status=status.HTTP_403_FORBIDDEN)
+
+
+class latestarticleview(APIView):
+    queryset = Article.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = ArticleSerializer
-
-    def get(self, request, pk=None):
-        print(pk)
-        if pk:
-            article = get_object_or_404(Article, pk=pk)
-            html = extract_file_content(article.file)
-            print(html)
-            safe_html = bleach.clean(
-                html,
-                tags=[
-                    "p", "br", "strong", "em", "ul", "ol", "li", "h1", "h2", "h3", "h4", "h5", "blockquote", "a"
-                ],
-                attributes={"a": ["href"]},
-                strip=True,
-            )
-
-            return JsonResponse({"html": safe_html},status=200)
-
+    
+    def get(self, request: Request, *args, **kwargs):
+        latestposts = Article.objects.order_by('-created_at')[:3]
+        serializer = ArticleSerializer(instance=latestposts, many=True)
+        print(serializer.data)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class ArticleAPIView(APIView):
@@ -172,4 +188,37 @@ class get_Article_to_review_APIView(APIView):
             # print(articles)
             serializer = ArticleSerializer(articles, many=True)
         return Response(serializer.data)
+
+
+class ArticleReviewSubmissionAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ArticleReviewsSerializer
+
+    def post(self, request):
+        user = request.user
+
+        if not user.is_staff:
+            return Response(
+                {"detail": "You must be a staff member to submit reviews."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        article_id = request.data.get('article')
+        article = get_object_or_404(Article, id=article_id)
+
+        article.reviewed = True
+        article.reviewed_by = user
+        article.save()
+
+        # The data can come in form-data, so we combine data and files
+        # print(request.data.article)
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 # Create your views here.

@@ -16,6 +16,8 @@ import { fetch_articles_to_review, dev_API_BASE_URL } from "../api/api_services"
 import { Worker, Viewer } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import { renderAsync } from "docx-preview";
+import { useNavigate } from "react-router-dom";
+
 
 function ArticleReviewList() {
   const [articles, setArticles] = useState([]);
@@ -68,9 +70,10 @@ function ArticleReviewList() {
     renderDocx();
   }, [selectedArticle]);
 
+  const navigate = useNavigate();
+
   const handleSelect = (article) => {
-    setSelectedArticle(article);
-    setReviewText("");
+    navigate(`/review/${article.id}`, { state: { article } });
   };
 
   const handleSubmitReview = () => {

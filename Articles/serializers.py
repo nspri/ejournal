@@ -83,3 +83,10 @@ class createAuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
         fields = ["firstname", "lastname", "title", "phone_number", "email"]
+
+class ArticleReviewsSerializer(serializers.ModelSerializer):
+    article = serializers.PrimaryKeyRelatedField(queryset=Article.objects.all())
+    class Meta:
+        model = articlereviews
+        fields = ['id', 'article', 'review_file', 'review_text', 'reviewed_at', 'updated_at']
+        read_only_fields = ['id', 'reviewed_at', 'updated_at']

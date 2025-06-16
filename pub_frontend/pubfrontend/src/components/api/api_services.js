@@ -129,3 +129,22 @@ export async function fetch_articles_to_review(finaldest){
     return response
   }
  }
+
+ // src/api/article_actions.js
+export async function publishArticle(articleId) {
+    //const token = localStorage.getItem("accessToken");
+    const response = await fetch(`${dev_API_BASE_URL}/articles/publish_paper/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${sessionStorage.getItem('accessToken')}`
+        },
+        body: JSON.stringify({ article: articleId }),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to publish article");
+    }
+    return response;
+}

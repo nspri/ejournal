@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { Link as RouterLink } from 'react-router-dom';
-import React, { useEffect, useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
+import React, { useState } from "react";
 import {
     Box,
     Typography,
@@ -11,102 +11,106 @@ import {
     Grid,
     Paper,
     Button,
-    CircularProgress
+    CircularProgress,
+    Switch,
+    FormControlLabel,
+    Snackbar,
+    Alert
 } from "@mui/material";
 import { Article } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import * as pdfjsLib from "pdfjs-dist";
-import * as mammoth from "mammoth";
-import { dev_API_BASE_URL } from "../api/api_services";
+import { dev_API_BASE_URL, publishArticle } from "../api/api_services";
 import { generateArticlePreviews } from "../utility/article_preview_generator";
 
-// Configure PDFJS worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 export default function Dashboard() {
-    //const [previews, setPreviews] = useState({});
     const [loading, setLoading] = useState(false);
+    const [articles, setArticles] = useState(
+        JSON.parse(localStorage.getItem("userProfile"))?.articles_submitted || []
+    );
 
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success", // "error" | "warning" | "info"
+    });
 
-    const storedUserProfile = JSON.parse(localStorage.getItem("userProfile")) || {
-        firstname: "John",
-        lastname: "Doe",
-        email: "example@example.com",
-        articles_submitted: [],
-    };
-    //const previews = {}
     const previews = JSON.parse(sessionStorage.getItem("articlePreviews") || "{}");
     const navigate = useNavigate();
-    console.log(storedUserProfile.articles_submitted
 
-    )
-    const handlereadarticle = async (articleId) => {
-        let final_destination = `articles/article_detail/${articleId}/`
-        await get_article_html(final_destination);
-        navigate("/fileviewer");
-    }
+    const handleTogglePublish = async (articleId) => {
+        try {
+            let response = await publishArticle(articleId);
+            //console.log(response)
+            
+            if (response.status === 200) {
+                response = await response.json()
+                const newStatus = response.pubstatus
+                setArticles((prev) =>
+                    prev.map((a) =>
+                        a.id === articleId ? { ...a, published: newStatus } : a
+                    )
+                );
 
-    // 🛠️ Fetch previews only once when the component mounts
-    //useEffect(() => {
-    //    const loadPreviews = async () => {
-    //        setLoading(true);
-    //        try {
-    //            const previewsMap = await generateArticlePreviews(storedUserProfile.articles_submitted);
-    //            setPreviews(previewsMap);
-    //        } catch (error) {
-    //            console.error("Error generating previews:", error);
-    //        } finally {
-    //                setLoading(false);
-    //           }
-    //      };
+            setSnackbar({
+                open: true,
+                message: newStatus ? "Article published!" : "Article unpublished!",
+                severity: "success",
+            });
+            } else {
+                response = await response.json()
+                setSnackbar({
+                    open: true,
+                    message: response.pubstatus || "Failed to update publish status.",
+                    severity: "error",
+                });
+            }
+        } catch (error) {
+            console.error("Toggle error:", error);
+            setSnackbar({
+                open: true,
+                message: "An error occurred.",
+                severity: "error",
+            });
+        }
+    };
 
-    //loadPreviews();
-    //}, [storedUserProfile.articles_submitted]);
-    //sessionStorage.setItem("articlePreviews", JSON.stringify(previewsMap));
-    //setPreviews(previewsMap);
+    const handleCloseSnackbar = () => {
+        setSnackbar((prev) => ({ ...prev, open: false }));
+    };
+
+    const handleReadArticle = (article) => {
+        navigate("/fileviewer", { state: { article } });
+    };
 
     return (
-        <Box sx={{
-            display: "flex",
-            alignItems: "center",         // vertically center content
-            justifyContent: "center",     // horizontally center conten
-        }}
-        >
-            <Box sx={{
-                backgroundColor: "#c0d3d9",
-                width: {
-                    xs: "10",   // 100% width on extra-small screens (mobile)
-                    sm: "10",    // 80% on small screens
-                    md: "10",    // 60% on medium screens
-                    lg: "10"     // 40% on large screens
-                }
-            }}>
-                {/* Profile Card */}
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <Box sx={{ backgroundColor: "#c0d3d9", width: "100%", maxWidth: 1000, p: 2 }}>
+                {/* Profile */}
                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
                     <Card sx={{ mb: 4, p: 2 }} elevation={3}>
                         <CardContent sx={{ display: "flex", alignItems: "center" }}>
                             <Avatar sx={{ width: 80, height: 80, mr: 2 }} src="/avatar.png" />
-                            <Box sx={{ ml: 'auto' }}>
-                                <Typography variant="h5">{`${storedUserProfile.firstname} ${storedUserProfile.lastname}`}</Typography>
-                                <Typography color="textSecondary">{storedUserProfile.email}</Typography>
+                            <Box sx={{ ml: "auto" }}>
+                                <Typography variant="h5">Your Dashboard</Typography>
                             </Box>
                         </CardContent>
                     </Card>
                 </motion.div>
 
-                {/* Articles Section */}
                 <Typography variant="h6" sx={{ mb: 2 }}>
                     Submitted Articles
                 </Typography>
 
                 {loading ? (
-
                     <Box display="flex" justifyContent="center" mt={4}>
                         <CircularProgress />
                     </Box>
                 ) : (
                     <Grid container spacing={2}>
-                        {storedUserProfile.articles_submitted.map((article, index) => (
+                        {articles.map((article, index) => (
                             <Grid item xs={12} sm={6} md={4} key={article.id}>
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
@@ -125,8 +129,9 @@ export default function Dashboard() {
                                             <Article sx={{ mr: 1 }} />
                                             {article.title}
                                         </Typography>
+
                                         {/* Authors */}
-                                        {article.authors && article.authors.length > 0 && (
+                                        {article.authors?.length > 0 && (
                                             <Box sx={{ mb: 1 }}>
                                                 <Typography variant="subtitle2">Authors:</Typography>
                                                 {article.authors.map((a, i) => (
@@ -136,35 +141,38 @@ export default function Dashboard() {
                                                 ))}
                                             </Box>
                                         )}
-                                        <Box justifyContent="center">
+
+                                        <Box justifyContent="center" sx={{ mb: 1 }}>
                                             <Chip
-                                                label={article.published ? 'Published' : 'Unpublished'}
-                                                color={article.published ? 'success' : 'warning'}
+                                                label={article.published ? "Published" : "Unpublished"}
+                                                color={article.published ? "success" : "warning"}
                                                 size="small"
                                                 sx={{ mr: 1 }}
                                             />
                                             <Chip
-                                                label={article.reviewed ? 'Reviewed' : 'Not Reviewed'}
-                                                color={article.reviewed ? 'info' : 'default'}
+                                                label={article.reviewed ? "Reviewed" : "Not Reviewed"}
+                                                color={article.reviewed ? "info" : "default"}
                                                 size="small"
                                             />
                                         </Box>
+
                                         <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                                             Submitted on: {new Date(article.created_at).toLocaleDateString()}
                                         </Typography>
+
                                         <Typography variant="body2" sx={{ mb: 2 }}>
                                             {previews[article.id] || "Generating preview..."}
                                         </Typography>
+
                                         <Button
                                             variant="outlined"
                                             color="primary"
-                                            //href={article.file}
-                                            //target="_blank"
                                             fullWidth
-                                            onClick={() => handlereadarticle(item.id)}
+                                            onClick={() => handleReadArticle(article)}
                                         >
                                             Read Full Article
                                         </Button>
+
                                         <Button
                                             variant="contained"
                                             color="secondary"
@@ -179,6 +187,19 @@ export default function Dashboard() {
                                             Update Article
                                         </Button>
 
+                                        {article.reviewed && (
+                                            <FormControlLabel
+                                                sx={{ mt: 1 }}
+                                                control={
+                                                    <Switch
+                                                        checked={article.published}
+                                                        onChange={() => handleTogglePublish(article.id)}
+                                                        color="success"
+                                                    />
+                                                }
+                                                label={article.published ? "Unpublish" : "Publish"}
+                                            />
+                                        )}
                                     </Paper>
                                 </motion.div>
                             </Grid>
@@ -186,13 +207,24 @@ export default function Dashboard() {
                     </Grid>
                 )}
 
-                {/* Submit New Article Button */}
                 <Box textAlign="center" mt={4}>
                     <Button variant="contained" color="primary" size="large" component={RouterLink} to="/submission">
                         Submit New Article
                     </Button>
                 </Box>
             </Box>
+
+            {/* Snackbar */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

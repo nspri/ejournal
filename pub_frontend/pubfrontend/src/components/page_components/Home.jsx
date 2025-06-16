@@ -57,32 +57,38 @@ const Home = () => {
 
   return (
     <Box>
-      <Box height={100} />
-
-      <Stack spacing={4} alignItems="center" textAlign="center">
-        <Typography variant="h3" fontWeight="bold">
-          N.S.P.R.I Publication
-        </Typography>
-        <Box maxWidth={600}>
-          <Typography variant="h6">
-            Science communication, articles and discussions on Nigerian public-health,
-            culture, politics, and more.
-          </Typography>
-        </Box>
-        <StyledButton
-          type="submit"
-          fullWidth
-          variant="contained"
-          color="primary"
-          component={RouterLink}
-
-          to="/submission"
-        >
-          Publish with us
-        </StyledButton>
-      </Stack>
-
-
+      <Stack
+  spacing={4}
+  alignItems="center"
+  textAlign="center"
+  color="#dfdfdf"     // <--- add this here
+>
+  <Typography variant="h3" fontWeight="bold">
+    N.S.P.R.I Publication
+  </Typography>
+  <Box maxWidth={600}>
+    <Typography variant="h6">
+      Science communication, articles and discussions on Nigerian public-health,
+      culture, politics, and more.
+    </Typography>
+  </Box>
+  <StyledButton
+  type="submit"
+  fullWidth
+  variant="contained"
+  component={RouterLink}
+  to="/submission"
+  sx={{
+    bgcolor: '#333',           // dark background
+    color: '#dfdfdf',          // light text
+    '&:hover': {
+      bgcolor: '#555',         // slightly lighter on hover
+    },
+  }}
+>
+  Publish with us
+</StyledButton>
+</Stack>
       <Box height={50} />
 
       <Typography
@@ -90,6 +96,7 @@ const Home = () => {
         fontWeight="bold"
         textAlign="center"
         sx={{ textDecoration: 'underline' }}
+        color="#dfdfdf"
       >
         Latest Publications
       </Typography>

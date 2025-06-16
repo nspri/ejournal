@@ -14,16 +14,6 @@ export const UserProvider = ({ children }) => {
     return storedArticleData ? JSON.parse(storedArticleData) : [];
   });
 
-  const [clothingData, setClothingData] = useState(() => {
-    const storedClothingData = sessionStorage.getItem('clothingData');
-    return storedClothingData ? JSON.parse(storedClothingData) : [];
-  });
-
-  const [comicsData, setComicsData] = useState(() => {
-    const storedComicsData = sessionStorage.getItem('comicsData');
-    return storedComicsData ? JSON.parse(storedComicsData) : [];
-  });
-
   // Fetch user data from API when logged in
   const fetchUserData = async () => {
     if (isLoggedIn) {
@@ -39,7 +29,7 @@ export const UserProvider = ({ children }) => {
         setArticleData(data);
         //setClothingData(data.clothing);
         //setComicsData(data.comics);
-        //console.log(data.comics)
+        console.log(data)
 
         sessionStorage.setItem('articleData', JSON.stringify(data));
         //sessionStorage.setItem('clothingData', JSON.stringify(data.clothing));
@@ -54,21 +44,6 @@ export const UserProvider = ({ children }) => {
     fetchUserData();
   }, [isLoggedIn]);
 
-  // Function to update individual data
-  const updateArtData = (newData) => {
-    setArtData((prevData) => [...prevData, newData]);
-    sessionStorage.setItem('artData', JSON.stringify([...artData, newData]));
-  };
-
-  const updateClothingData = (newData) => {
-    setClothingData((prevData) => [...prevData, newData]);
-    sessionStorage.setItem('clothingData', JSON.stringify([...clothingData, newData]));
-  };
-
-  const updateComicsData = (newData) => {
-    setComicsData((prevData) => [...prevData, newData]);
-    sessionStorage.setItem('comicsData', JSON.stringify([...comicsData, newData]));
-  };
   const getItemById = (type, id) => {
     if (type === 'art') {
       return artData.find((item) => item.art_id === id);
@@ -87,9 +62,6 @@ export const UserProvider = ({ children }) => {
         //clothingData,
         //comicsData,
         getItemById,
-        updateArtData,
-        updateClothingData,
-        updateComicsData
       }}>
       {children}
     </UserContext.Provider>

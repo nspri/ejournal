@@ -21,6 +21,7 @@ import { label } from "framer-motion/client";
 
 const navItems = [
   { label: "Home", path: "/" },
+  { label: "Articles", path: "/articles" },
   { label: "About", path: "/about" },
   { label: "Dashboard", path: "/dashboard" },
   { label: "Editorial Team", path: "/edit_team" },
@@ -30,6 +31,11 @@ const navItems = [
   //{ label: ""}
   //{ label: "Article Categories", path: "/article-categories" },
 ];
+const articlesdropdown = [
+  { label: "Articles & Submissions", path: "/articles_list" },
+  { label: "Submit Articles", path: "/submission" },
+
+]
 const aboutdropdowm = [
   { label: "About NIJOPHAR", path: "/about_nijophar" },
   { label: "About NSPRI", path: "/about_nspri" },
@@ -65,6 +71,7 @@ const contributionsdropdown = [
 ]
 
 let drop_downlabels = [
+  { label: "Articles", items: articlesdropdown },
   { label: "About", items: aboutdropdowm },
   { label: "Policies & Guidelines", items: policydropdown },
   { label: "ISSUES", items: issuesdropdown },
@@ -156,7 +163,7 @@ function Navbar() {
   };
   return (
     <>
-      <AppBar position="fixed" sx={{ backgroundColor: '#c0d3d9' }}> {/* Changed position to "fixed" */}
+      <AppBar position="fixed" sx={{ backgroundColor: '#141414' }}> {/* Changed position to "fixed" */}
         <Toolbar>
           {/* Website Name on the Left */}
           <Stack direction="row" spacing={1 }>
@@ -182,6 +189,15 @@ function Navbar() {
                   key={index}
                   label={item.label}
                   menuItems={dropdownMap[item.label]} // Pass the matched items
+                  sx={{
+                    color: location.pathname.startsWith(item.path) ? '#fff' : '#dfdfdf',
+                    textDecoration: location.pathname.startsWith(item.path) ? 'underline' : 'none',
+                    '&:hover': {
+                        color: '#000', 
+                        bgcolor: '#dfdfdf',
+                        textDecoration: 'underline',
+                      },
+                    }}
                 />
               ) : (
                 <Button
@@ -191,10 +207,11 @@ function Navbar() {
                   to={item.path}
                   onClick={handleClick}
                   sx={{
-                    color: location.pathname === item.path ? 'black' : 'inherit',
+                    color: location.pathname === item.path ? '#fff' : '#dfdfdf',
                     textDecoration: location.pathname === item.path ? 'underline' : 'none',
                     '&:hover': {
-                      color: 'black',
+                      color: '#fff',
+                      bgcolor: '#333', 
                       textDecoration: 'underline',
                     },
                   }}
