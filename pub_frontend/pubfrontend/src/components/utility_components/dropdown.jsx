@@ -1,60 +1,136 @@
-import React, { useState } from "react";
-import { Menu, MenuItem, Button } from "@mui/material";
+import React, { useState, useRef } from "react";
+import {
+    Popper,
+    Paper,
+    MenuItem,
+    Button,
+    ClickAwayListener,
+    useMediaQuery,
+} from "@mui/material";
 import { Link } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
 
-const DropdownMenu = ({ location, label = "Menu", menuItems, onItemClick = () => { } }) => {
-    const [anchorEl, setAnchorEl] = useState(null);
+const DropdownMenu = ({
+    location,
+    label = "Menu",
+    menuItems = [],
+    onItemClick = () => {},
+    sx = {},
+}) => {
+    const [open, setOpen] = useState(false);
+    const anchorRef = useRef(null);
+    const timeoutRef = useRef(null);
 
-    const handleMenuOpen = (event) => {
-        setAnchorEl(event.currentTarget);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("md")); // sm & md are mobile now
+
+    const handleMouseEnter = () => {
+        if (!isMobile) {
+            clearTimeout(timeoutRef.current);
+            setOpen(true);
+        }
     };
 
-    const handleMenuClose = () => {
-        setAnchorEl(null);
+    const handleMouseLeave = () => {
+        if (!isMobile) {
+            timeoutRef.current = setTimeout(() => {
+                setOpen(false);
+            }, 200);
+        }
+    };
+
+    const cancelClose = () => clearTimeout(timeoutRef.current);
+
+    const handleClick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setOpen((prev) => !prev);
+    };
+
+    const handleClickAway = (event) => {
+        if (anchorRef.current && anchorRef.current.contains(event.target)) {
+            return;
+        }
+        setOpen(false);
+    };
+
+    const handleItemClick = (itemPath) => {
+        onItemClick(itemPath);
+        setOpen(false);
     };
 
     return (
-        <>
-            <Button sx={{
-                //color: location.pathname === item.path ? 'black' : 'inherit',
-                color: "inherit",
-                //textDecoration: location.pathname === item.path ? 'underline' : 'none',
-                '&:hover': {
-                    color: 'black',
-                    textDecoration: 'underline',
-                },
-            }} onClick={handleMenuOpen}>{label}</Button>
-            <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                MenuListProps={{
-                    onMouseLeave: handleMenuClose,
+        <ClickAwayListener onClickAway={handleClickAway}>
+            <div
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                style={{
+                    display: "inline-block",
+                    position: "relative",
                 }}
             >
-                {menuItems.map((item, index) => (
-                    <MenuItem
-                        sx={{
-                            color: location.pathname === item.path ? 'black' : 'inherit',
-                            textDecoration: location.pathname === item.path ? 'underline' : 'none',
-                            '&:hover': {
-                                color: 'black',
-                                textDecoration: 'underline',
+                <Button
+                    ref={anchorRef}
+                    onClick={handleClick} // always allow click
+                    sx={{
+                        color: "inherit",
+                        textTransform: "none",
+                        fontSize: "inherit",
+                        fontWeight: "inherit",
+                        minWidth: "auto",
+                        ...sx,
+                    }}
+                >
+                    {label}
+                </Button>
+
+                <Popper
+                    open={open}
+                    anchorEl={anchorRef.current}
+                    placement="bottom-start"
+                    disablePortal={false}
+                    modifiers={[
+                        {
+                            name: "offset",
+                            options: {
+                                offset: [0, 8],
                             },
-                        }}
-                        key={index}
-                        component={Link}
-                        to={item.path}
-                        onClick={() => {
-                            onItemClick(item.path);
-                            handleMenuClose();
+                        },
+                    ]}
+                    style={{ zIndex: 1300 }}
+                >
+                    <Paper
+                        onMouseEnter={cancelClose}
+                        onMouseLeave={handleMouseLeave}
+                        elevation={3}
+                        sx={{
+                            maxHeight: "400px",
+                            overflowY: "auto",
+                            minWidth: "200px",
+                            mt: 0.5,
                         }}
                     >
-                        {item.label}
-                    </MenuItem>
-                ))}
-            </Menu>
-        </>
+                        {menuItems.map((item, index) => (
+                            <MenuItem
+                                key={index}
+                                component={Link}
+                                to={item.path}
+                                onClick={() => handleItemClick(item.path)}
+                                sx={{
+                                    color: location?.pathname === item.path ? "primary.main" : "inherit",
+                                    fontWeight: location?.pathname === item.path ? "bold" : "normal",
+                                    "&:hover": {
+                                        backgroundColor: "action.hover",
+                                    },
+                                }}
+                            >
+                                {item.label}
+                            </MenuItem>
+                        ))}
+                    </Paper>
+                </Popper>
+            </div>
+        </ClickAwayListener>
     );
 };
 

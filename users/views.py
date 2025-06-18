@@ -14,6 +14,7 @@ from django.core.files.base import ContentFile
 from datetime import datetime
 from Articles.models import Article
 from Articles.serializers import ArticleSerializer
+from rest_framework.parsers import MultiPartParser, FormParser
 
 # Create your views here.
 
@@ -94,6 +95,8 @@ class LoginView(APIView):
                 "lastname": user.lastname,
                 "email": user.email,
                 "profilephoto": user.profile.image.url,
+                "title":user.profile.title,
+                "phonenumber":user.profile.phonenumber,
                 "articles_submitted": serialized_articles,
                 #"is_staff": True,
                 "is_staff": user.is_staff,
@@ -112,47 +115,47 @@ class LoginView(APIView):
 
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
-    # serializer_class = ProfileSerializer
+    parser_classes = (MultiPartParser, FormParser)
 
-    def decode_base64(base64_string):
-        # Split the base64 string to get the content type and the data
-        format, imgstr = base64_string
-        g.split(";base64,")
-        # Decode base64 string
-        data = ContentFile(
-            base64.b64decode(imgstr), name="temp"
-        )  # Assuming PNG format here
-        return data
+    def get_object(self, request):
+        return Profile.objects.get(user=request.user)
+    
+    def get(self, request):
+        profile = self.get_object(request)
+        serializer = ProfileSerializer(profile, context={'request': request})
+        return Response(serializer.data)
 
-    def post(self, request: Request, name: str):
-        profile = Profile.objects.get(user__username=name)
-        user = User.objects.get(username=name)
-        print(profile)
-        email = request.data.get("email")
-        user.email = email
-        name = request.data.get("name")
-        user.username = name
-        age = request.data.get("age")
-        profile.age = age
-        dob = request.data.get("dob")
-        date_object = datetime.strptime(dob, "%Y-%m-%d").date()
-        user.date_of_birth = date_object
-        print(user.date_of_birth)
-        image = request.data.get("image")
-        # print(image)
-        if image:
-            # Decode base64 string into image data
-            # format, img = image.split(';base64,')
-            image_data = ContentFile(base64.b64decode(image), name="profile.png")
-            #   Save image data to the database
-            #   image = ImageModel()
-            #   image.image_field.save('image.png', image_data, save=True)  # Adjust 'image_field' to your actual image field name
-            profile.image = image_data
-        profile.save()
-        user.save()
-        response = {
-            "message": "Successfull",
+    def post(self, request):
+        profile = self.get_object(request)  # This should return a Profile instance
+        user = User.objects.get(profile=profile)  # Get related User instance
+        print(request.data)
+    # Extract data sent from frontend
+        user_data = {
+            "firstname": request.data.get("user.firstname"),
+            "lastname": request.data.get("user.lastname"),
+            "email": request.data.get("user.email"),
+            "username": request.data.get("user.username"),
         }
-        return Response(data=response, status=status.HTTP_200_OK)
 
-# Create your views here.
+        profile_data = {
+            "title": request.data.get("title"),
+            "phonenumber": request.data.get("phonenumber"),
+            "image": request.FILES.get("image"),
+        }
+
+    # Bind instance + data to serializers
+        pro_serializer = ProfileSerializer(instance=profile, data=profile_data, context={'request': request}, partial=True)
+        user_serializer = UserSerializer(instance=user, data=user_data, partial=True)
+        is_pro_valid = pro_serializer.is_valid()
+        is_user_valid = user_serializer.is_valid()
+
+        if is_pro_valid and is_user_valid:
+            pro_serializer.save()
+            user_serializer.save()
+        
+        # Return combined updated data
+            return Response({'user': user_serializer.data,'profile': pro_serializer.data,}, status=status.HTTP_200_OK)
+        else:
+            print(user_serializer.errors)
+            print(pro_serializer.errors)
+            return Response({'user_errors': user_serializer.errors,'profile_errors': pro_serializer.errors,}, status=status.HTTP_400_BAD_REQUEST)

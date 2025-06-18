@@ -127,7 +127,7 @@ function ReviewPage() {
         backgroundColor: "#f8fafc",
         py: 4,
         px: { xs: 2, sm: 3, md: 4 },
-        width: { xs:100 , sm: 380, md: 1000 }
+        width: { xs:200 , sm: 450, md:500, lg: 1000}
         
       }}
     >

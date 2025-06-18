@@ -8,6 +8,7 @@ import {
     Card,
     Chip,
     CardContent,
+    CardHeader,
     Grid,
     Paper,
     Button,
@@ -15,8 +16,12 @@ import {
     Switch,
     FormControlLabel,
     Snackbar,
-    Alert
+    Alert,
+    Tooltip,
+    Stack,
+    IconButton,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import { Article } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import * as pdfjsLib from "pdfjs-dist";
@@ -27,9 +32,13 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 
 export default function Dashboard() {
     const [loading, setLoading] = useState(false);
-    const [articles, setArticles] = useState(
-        JSON.parse(localStorage.getItem("userProfile"))?.articles_submitted || []
-    );
+    const userProfile = JSON.parse(localStorage.getItem("userProfile")) || {};
+    
+    const profileSrc = `${dev_API_BASE_URL}${userProfile.profilePhoto}`|| "/avatar.png";
+    //console.log(profileSrc);
+    console.log(userProfile)
+    const [articles, setArticles] = useState(userProfile.articles_submitted || []);
+
 
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -39,6 +48,9 @@ export default function Dashboard() {
 
     const previews = JSON.parse(sessionStorage.getItem("articlePreviews") || "{}");
     const navigate = useNavigate();
+    const goToEditProfile = () => {
+        navigate("/edit-profile");
+  };
 
     const handleTogglePublish = async (articleId) => {
         try {
@@ -90,14 +102,55 @@ export default function Dashboard() {
             <Box sx={{ backgroundColor: "#c0d3d9", width: "100%", maxWidth: 1000, p: 2 }}>
                 {/* Profile */}
                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-                    <Card sx={{ mb: 4, p: 2 }} elevation={3}>
-                        <CardContent sx={{ display: "flex", alignItems: "center" }}>
-                            <Avatar sx={{ width: 80, height: 80, mr: 2 }} src="/avatar.png" />
-                            <Box sx={{ ml: "auto" }}>
-                                <Typography variant="h5">Your Dashboard</Typography>
-                            </Box>
-                        </CardContent>
-                    </Card>
+                   <Card 
+      sx={{ 
+        mb: 4, 
+        p: 0, 
+        maxWidth: 400, 
+        mx: "auto", 
+        borderRadius: 2, 
+        boxShadow: 3 
+      }} 
+      elevation={3}
+    >
+      <CardHeader
+        avatar={
+          <Avatar
+            sx={{ width: 80, height: 80 }}
+            src={profileSrc}
+            alt={userProfile.firstname || "U"}
+          />
+        }
+        action={
+          <Tooltip title="Edit profile">
+            <IconButton onClick={goToEditProfile} size="small">
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+        }
+        title={
+          <Typography variant="h6">
+            {userProfile.firstname} {userProfile.lastname}
+          </Typography>
+        }
+        sx={{
+          pb: 0,
+          "& .MuiCardHeader-content": {
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          },
+        }}
+      />
+      <CardContent sx={{ pt: 1 }}>
+        <Box>
+          <Typography variant="body2" color="text.secondary">
+            {/* Insert subtitle or bio—e.g. job title or summary */}
+            {/*userProfile.bio || "Your profile summary here."*/}
+          </Typography>
+        </Box>
+      </CardContent>
+    </Card>
                 </motion.div>
 
                 <Typography variant="h6" sx={{ mb: 2 }}>

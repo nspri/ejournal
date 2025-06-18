@@ -205,7 +205,7 @@ export default function DocumentViewer() {
                 </Zoom>
             </Box>
 
-            <Container sx={{width: { xs:300 , sm: 450, md: 1000 }}}>
+            <Container sx={{width: { xs:200 , sm: 450, md:500, lg: 1000 }}}>
                 <Box sx={{ mb: 4 }}>
                     <Typography variant="h4" sx={{ fontWeight: 700, color: textColor, mb: 1 }}>
                         <Description sx={{ verticalAlign: "middle", mr: 1, color: "#3b82f6" }} />

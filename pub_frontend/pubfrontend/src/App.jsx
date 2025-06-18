@@ -14,6 +14,8 @@ import Dashboard from './components/page_components/Dashboard';
 import ArticleReviewList from './components/page_components/article_review';
 import ReviewPage from './components/page_components/reviewpage';
 import DocumentViewer from './components/page_components/view_article';
+import ArticleList from './components/page_components/article_list';
+import EditProfilePage from './components/page_components/edit_profile';
 function App() {
   const [count, setCount] = useState(0)
 
@@ -25,7 +27,9 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Registration />} />
+          <Route path="/edit-profile" element={<EditProfilePage />} />
           <Route path="/submission" element={<Submissions />} />
+          <Route path="/articles_list" element={<ArticleList/>} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/review" element={<ArticleReviewList />} />
           <Route path="/review/:articleId" element={<ReviewPage />} />

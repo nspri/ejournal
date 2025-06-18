@@ -10,17 +10,21 @@ from .models import *
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "email"]
+        fields = ["id","username","firstname","lastname","email"]
 
 
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
-    image = Base64ImageField(required=False)
+    age = serializers.CharField(required=False, allow_null=True,allow_blank=True)
+    image = serializers.ImageField(required=False, allow_null=True)
+    # image = Base64ImageField(required=False)
 
     class Meta:
         model = Profile
-        fields = ["age", "title", "image", "user", "phonenumber", "title"]
+        fields = ["age", "title", "image", "user", "phonenumber"]
 
+    
+    
     def create(self, validated_data):
         # Override the create method to handle user creation
         user_data = validated_data.pop("user")
