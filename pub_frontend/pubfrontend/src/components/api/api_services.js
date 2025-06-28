@@ -80,17 +80,13 @@ export async function post_encryped_data(data, finaldest) {
     }
 
     // Encrypt the rest
-    console.log(clean)
     const encryptedPayload = encryptpostdata(sensitiveFields);
-    console.log(clean);
     const payload = {
       encrypted: encryptedPayload,
       clean: clean,
       // all fields encrypted
       image: foundImages || null       // image stays as base64
     };
-    //console.log(payload);
-    ///user/signup/
     const response = await fetch(`${dev_API_BASE_URL}${finaldest}`, {
       method: "POST",
       headers: {
@@ -123,7 +119,6 @@ export async function fetch_articles_to_review(finaldest){
     const data = await response.json();
     //console.log(data)
     //sessionStorage.setItem("html_content", data.html);
-    console.log(data)
     return data
   }else{
     return response

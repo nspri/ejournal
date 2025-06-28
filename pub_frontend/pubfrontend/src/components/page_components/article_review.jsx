@@ -82,11 +82,6 @@ function ArticleReviewList() {
       return;
     }
 
-    console.log("Review submitted:", {
-      articleId: selectedArticle.id,
-      review: reviewText,
-    });
-
     alert("Review submitted!");
     setSelectedArticle(null);
     setReviewText("");

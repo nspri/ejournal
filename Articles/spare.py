@@ -3,11 +3,9 @@ class Article_detail_APIView(APIView):
     serializer_class = ArticleSerializer
 
     def get(self, request, pk=None):
-        print(pk)
         if pk:
             article = get_object_or_404(Article, pk=pk)
             html = extract_file_content(article.file)
-            print(html)
             safe_html = bleach.clean(
                 html,
                 tags=[

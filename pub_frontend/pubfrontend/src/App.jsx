@@ -16,6 +16,8 @@ import ReviewPage from './components/page_components/reviewpage';
 import DocumentViewer from './components/page_components/view_article';
 import ArticleList from './components/page_components/article_list';
 import EditProfilePage from './components/page_components/edit_profile';
+import PasswordResetRequest from './components/auth_components/pass_reset';
+import PasswordResetConfirm from './components/auth_components/passrescon';
 function App() {
   const [count, setCount] = useState(0)
 
@@ -35,6 +37,8 @@ function App() {
           <Route path="/review/:articleId" element={<ReviewPage />} />
           <Route path="/" element={<Home />} />
           <Route path="/fileviewer" element={<DocumentViewer />} />
+          <Route path="/passresetreq" element={<PasswordResetRequest />} />
+          <Route path="/password-reset-confirm" element={<PasswordResetConfirm />} />
         </Routes>
         {/* <Routes>
         <Route path="/post" element={<Post />} />

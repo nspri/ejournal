@@ -29,8 +29,6 @@ class PublishArticleView(APIView):
             return Response({"detail": "Article ID not provided."}, status=status.HTTP_400_BAD_REQUEST)
 
         article_to_publish = get_object_or_404(Article, id=article_id)
-        print(article_to_publish.submitted_by)
-        print(request.user)
 
         if article_to_publish.reviewed and request.user == article_to_publish.submitted_by:
             if article_to_publish.published == True:
@@ -53,8 +51,7 @@ class latestarticleview(APIView):
     def get(self, request: Request, *args, **kwargs):
         latestposts = Article.objects.order_by('-created_at')[:3]
         serializer = ArticleSerializer(instance=latestposts, many=True)
-        print(serializer.data)
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
+       return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class ArticleAPIView(APIView):
@@ -73,9 +70,8 @@ class ArticleAPIView(APIView):
                 )
             )
             for article in articles:
-                #print(article.title)
                 for author in article.authors.all():
-                    print(f"- {author.firstname} {author.lastname}")
+                    #print(f"- {author.firstname} {author.lastname}")
             # author_serializer = AuthorSerializer(authors, many=True)
             serializer = ArticleSerializer(article)
         else:
@@ -86,7 +82,7 @@ class ArticleAPIView(APIView):
                     queryset=authorToarticle.objects.select_related("author"),
                 )
             )
-            print(articles)
+        
             serializer = ArticleSerializer(articles, many=True)
         return Response(serializer.data)
 
@@ -102,9 +98,8 @@ class ArticleAPIView(APIView):
         # add the user that submitted
         data["submitted_by"] = request.user
 
-        # print(data)
+        
         article_serializer = ArticleSerializer(data=data, context={"request": request})
-        # print(data)
         if article_serializer.is_valid():
             # save the article data
             article = article_serializer.save()
@@ -132,7 +127,6 @@ class ArticleAPIView(APIView):
 
     def put(self, request, pk):
         article = get_object_or_404(Article, pk=pk)
-        print(request.data)
         article.title = request.data.get("title")
         article.file = request.data.get("file")
         article.cover_image =request.data.get("cover_image")
@@ -142,17 +136,13 @@ class ArticleAPIView(APIView):
             "authors", "[]"
         ) 
         authors_data = json.loads(authors_data)
-        print(authors_data)
         for author_data in authors_data:
             a = author_data.get("author", author_data) 
-            #print(a["firstname"])
             new_author = Author.objects.create(firstname=a["firstname"],lastname=a["lastname"],phone_number=a["phone_number"],email=a["email"],title=a["title"])
-            print(new_author)
             authorToarticle.objects.create(article = article,author = new_author)
             #Author.objects.create(firstname=author_data)
         serializer = ArticleSerializer(article)
             # serializer.save()
-        print(serializer.data)
         return Response(serializer.data,status=201)
         #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -171,10 +161,8 @@ class get_Article_to_review_APIView(APIView):
                     queryset=authorToarticle.objects.select_related("author"),
                 )
             )
-            for article in articles:
-                print(article.title)
-                for author in article.authors.all():
-                    print(f"- {author.firstname} {author.lastname}")
+            #for article in articles:
+            #    for author in article.authors.all():
             # author_serializer = AuthorSerializer(authors, many=True)
             serializer = ArticleSerializer(article)
         else:
@@ -185,7 +173,6 @@ class get_Article_to_review_APIView(APIView):
                     queryset=authorToarticle.objects.select_related("author"),
                 )
             )
-            # print(articles)
             serializer = ArticleSerializer(articles, many=True)
         return Response(serializer.data)
 
@@ -210,7 +197,7 @@ class ArticleReviewSubmissionAPIView(APIView):
         article.save()
 
         # The data can come in form-data, so we combine data and files
-        # print(request.data.article)
+
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():

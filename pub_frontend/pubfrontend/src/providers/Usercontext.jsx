@@ -29,7 +29,6 @@ export const UserProvider = ({ children }) => {
         setArticleData(data);
         //setClothingData(data.clothing);
         //setComicsData(data.comics);
-        console.log(data)
 
         sessionStorage.setItem('articleData', JSON.stringify(data));
         //sessionStorage.setItem('clothingData', JSON.stringify(data.clothing));

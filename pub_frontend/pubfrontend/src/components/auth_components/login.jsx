@@ -182,7 +182,9 @@ const Login = () => {
                 fullWidth
                 variant="text"
                 color="primary"
-                href="https://npvbackend.onrender.com/password-reset/"  // Django URL here
+                //href="https://npvbackend.onrender.com/password-reset/"  // Django URL here
+                component={Link}
+                to="/passresetreq"
               >
                 Forgot Password?
               </StyledButton>

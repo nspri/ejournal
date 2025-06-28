@@ -37,7 +37,6 @@ class SignUpView(generics.GenericAPIView):
         if image_data:
             clean["profile"]["image"] = image_data
         else:
-            print("No image data found")
         
         clean.update({
                 'firstname': data.get('firstname'),
@@ -59,7 +58,6 @@ class SignUpView(generics.GenericAPIView):
 
             return Response(data=response, status=status.HTTP_201_CREATED)
         else:
-            print(serializer.errors)
 
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -72,7 +70,6 @@ class LoginView(APIView):
         decrypted_login_details = decrypt_incoming_data(encrypted_b64)
         # email = request.data.get("email")
         # password = request.data.get("password")
-        # print(email,password)
         user = authenticate(
             email=decrypted_login_details.get("email"),
             password=decrypted_login_details.get("password"),
@@ -83,7 +80,7 @@ class LoginView(APIView):
             tokens = create_jwt_pair_for_user(user)
             user_articles = Article.objects.filter(submitted_by=user)
             serialized_articles = ArticleSerializer(user_articles, many=True).data
-            # print(serialized_articles)
+            #
 
             # with open(user.profile.image.path, "rb") as img_file:
             # image = base64.b64encode(img_file.read()).decode("utf-8")
@@ -101,7 +98,6 @@ class LoginView(APIView):
                 #"is_staff": True,
                 "is_staff": user.is_staff,
             }
-            print(response)
             return Response(data=response, status=status.HTTP_200_OK)
 
         else:
@@ -128,7 +124,6 @@ class ProfileView(APIView):
     def post(self, request):
         profile = self.get_object(request)  # This should return a Profile instance
         user = User.objects.get(profile=profile)  # Get related User instance
-        print(request.data)
     # Extract data sent from frontend
         user_data = {
             "firstname": request.data.get("user.firstname"),
@@ -156,6 +151,4 @@ class ProfileView(APIView):
         # Return combined updated data
             return Response({'user': user_serializer.data,'profile': pro_serializer.data,}, status=status.HTTP_200_OK)
         else:
-            print(user_serializer.errors)
-            print(pro_serializer.errors)
             return Response({'user_errors': user_serializer.errors,'profile_errors': pro_serializer.errors,}, status=status.HTTP_400_BAD_REQUEST)

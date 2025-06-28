@@ -118,7 +118,7 @@ function Navbar() {
   );
 
   const filterpostByCategory = (category) => {
-    console.log("Filtering by category:", category);
+    //console.log("Filtering by category:", category);
   };
 
   const handleClick = () => {

@@ -35,7 +35,7 @@ const Home = () => {
     margin: theme.spacing(3, 0, 2),
   }));
   const navigate = useNavigate();
-  console.log(articleData)
+  .log(articleData)
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -43,7 +43,7 @@ const Home = () => {
         await fetchlatestpost();
         await fetchpodcast();
       } catch (error) {
-        console.error("Error fetching data:", error);
+        .error("Error fetching data:", error);
       }
     };
 

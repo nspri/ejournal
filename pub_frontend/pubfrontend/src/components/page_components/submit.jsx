@@ -89,9 +89,7 @@ function Submissions() {
                 body: formData,
             });
             const result = await response.json();
-            console.log(result)
             if (response.status == 201) {
-                console.log("Upload success:", result);
                 sessionStorage.removeItem("articleToUpdate");
                 sessionStorage.removeItem("articleFormMethod");
                 navigate("/");

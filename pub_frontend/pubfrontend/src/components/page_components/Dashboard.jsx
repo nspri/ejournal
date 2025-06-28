@@ -36,7 +36,6 @@ export default function Dashboard() {
     
     const profileSrc = `${dev_API_BASE_URL}${userProfile.profilePhoto}`|| "/avatar.png";
     //console.log(profileSrc);
-    console.log(userProfile)
     const [articles, setArticles] = useState(userProfile.articles_submitted || []);
 
 
