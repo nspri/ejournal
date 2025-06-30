@@ -29,7 +29,7 @@ class SignUpView(generics.GenericAPIView):
         clean = request.data.get("clean")
         data = decrypt_incoming_data(encrypted_b64)
         if isinstance(clean, str):
-                clean = json.loads(clean)
+            clean = json.loads(clean)
         if isinstance(image, list) and len(image) > 0:
             image_data = image[0].get(
                 "data", None
@@ -37,19 +37,22 @@ class SignUpView(generics.GenericAPIView):
         if image_data:
             clean["profile"]["image"] = image_data
         else:
-        
-        clean.update({
-                'firstname': data.get('firstname'),
-                'lastname': data.get('lastname'),
-                'password': data.get('password'),
-            })
+            clean.update(
+                {
+                    "firstname": data.get("firstname"),
+                    "lastname": data.get("lastname"),
+                    "password": data.get("password"),
+                }
+            )
         # Merge nested profile fields
-        if 'profile' not in clean:
-            lean['profile'] = {}
+        if "profile" not in clean:
+            lean["profile"] = {}
 
-        clean['profile'].update({
-            'phonenumber': data.get('phonenumber'),
-            })
+        clean["profile"].update(
+            {
+                "phonenumber": data.get("phonenumber"),
+            }
+        )
         serializer = self.serializer_class(data=clean)
 
         if serializer.is_valid():
@@ -58,8 +61,7 @@ class SignUpView(generics.GenericAPIView):
 
             return Response(data=response, status=status.HTTP_201_CREATED)
         else:
-
-        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(APIView):
@@ -92,10 +94,10 @@ class LoginView(APIView):
                 "lastname": user.lastname,
                 "email": user.email,
                 "profilephoto": user.profile.image.url,
-                "title":user.profile.title,
-                "phonenumber":user.profile.phonenumber,
+                "title": user.profile.title,
+                "phonenumber": user.profile.phonenumber,
                 "articles_submitted": serialized_articles,
-                #"is_staff": True,
+                # "is_staff": True,
                 "is_staff": user.is_staff,
             }
             return Response(data=response, status=status.HTTP_200_OK)
@@ -115,16 +117,16 @@ class ProfileView(APIView):
 
     def get_object(self, request):
         return Profile.objects.get(user=request.user)
-    
+
     def get(self, request):
         profile = self.get_object(request)
-        serializer = ProfileSerializer(profile, context={'request': request})
+        serializer = ProfileSerializer(profile, context={"request": request})
         return Response(serializer.data)
 
     def post(self, request):
         profile = self.get_object(request)  # This should return a Profile instance
         user = User.objects.get(profile=profile)  # Get related User instance
-    # Extract data sent from frontend
+        # Extract data sent from frontend
         user_data = {
             "firstname": request.data.get("user.firstname"),
             "lastname": request.data.get("user.lastname"),
@@ -138,8 +140,13 @@ class ProfileView(APIView):
             "image": request.FILES.get("image"),
         }
 
-    # Bind instance + data to serializers
-        pro_serializer = ProfileSerializer(instance=profile, data=profile_data, context={'request': request}, partial=True)
+        # Bind instance + data to serializers
+        pro_serializer = ProfileSerializer(
+            instance=profile,
+            data=profile_data,
+            context={"request": request},
+            partial=True,
+        )
         user_serializer = UserSerializer(instance=user, data=user_data, partial=True)
         is_pro_valid = pro_serializer.is_valid()
         is_user_valid = user_serializer.is_valid()
@@ -147,8 +154,20 @@ class ProfileView(APIView):
         if is_pro_valid and is_user_valid:
             pro_serializer.save()
             user_serializer.save()
-        
-        # Return combined updated data
-            return Response({'user': user_serializer.data,'profile': pro_serializer.data,}, status=status.HTTP_200_OK)
+
+            # Return combined updated data
+            return Response(
+                {
+                    "user": user_serializer.data,
+                    "profile": pro_serializer.data,
+                },
+                status=status.HTTP_200_OK,
+            )
         else:
-            return Response({'user_errors': user_serializer.errors,'profile_errors': pro_serializer.errors,}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {
+                    "user_errors": user_serializer.errors,
+                    "profile_errors": pro_serializer.errors,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )

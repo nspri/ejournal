@@ -6,10 +6,11 @@ from .models import Article, Author
 from .serializers import ArticleSerializer, AuthorSerializer
 from django.shortcuts import get_object_or_404
 from django.db.models import Prefetch
-from rest_framework.permissions import IsAuthenticatedOrReadOnly,IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .serializers import *
 import json
 import bleach
+
 # views.py
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -23,14 +24,20 @@ class PublishArticleView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request: Request, *args, **kwargs):
-        article_id = request.data.get('article')
+        article_id = request.data.get("article")
 
         if not article_id:
-            return Response({"detail": "Article ID not provided."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Article ID not provided."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         article_to_publish = get_object_or_404(Article, id=article_id)
 
-        if article_to_publish.reviewed and request.user == article_to_publish.submitted_by:
+        if (
+            article_to_publish.reviewed
+            and request.user == article_to_publish.submitted_by
+        ):
             if article_to_publish.published == True:
                 article_to_publish.published = False
                 pub_status = False
@@ -40,18 +47,23 @@ class PublishArticleView(APIView):
             article_to_publish.save()
             return Response({"pubstatus": pub_status}, status=status.HTTP_200_OK)
         else:
-            return Response({"detail": "You are not authorized to publish this article or it hasn't been reviewed yet."}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {
+                    "detail": "You are not authorized to publish this article or it hasn't been reviewed yet."
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
 
 class latestarticleview(APIView):
     queryset = Article.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = ArticleSerializer
-    
+
     def get(self, request: Request, *args, **kwargs):
-        latestposts = Article.objects.order_by('-created_at')[:3]
+        latestposts = Article.objects.order_by("-created_at")[:3]
         serializer = ArticleSerializer(instance=latestposts, many=True)
-       return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class ArticleAPIView(APIView):
@@ -69,20 +81,22 @@ class ArticleAPIView(APIView):
                     queryset=authorToarticle.objects.select_related("author"),
                 )
             )
-            for article in articles:
-                for author in article.authors.all():
-                    #print(f"- {author.firstname} {author.lastname}")
+            # for article in articles:
+            #    for author in article.authors.all():
+            # print(f"- {author.firstname} {author.lastname}")
             # author_serializer = AuthorSerializer(authors, many=True)
             serializer = ArticleSerializer(article)
         else:
             # articles = Article.objects.all()
-            articles = Article.objects.filter(published=True,reviewed=True).prefetch_related(
+            articles = Article.objects.filter(
+                published=True, reviewed=True
+            ).prefetch_related(
                 Prefetch(
                     "authors",  # related_name from authorToarticle
                     queryset=authorToarticle.objects.select_related("author"),
                 )
             )
-        
+
             serializer = ArticleSerializer(articles, many=True)
         return Response(serializer.data)
 
@@ -98,7 +112,6 @@ class ArticleAPIView(APIView):
         # add the user that submitted
         data["submitted_by"] = request.user
 
-        
         article_serializer = ArticleSerializer(data=data, context={"request": request})
         if article_serializer.is_valid():
             # save the article data
@@ -129,24 +142,29 @@ class ArticleAPIView(APIView):
         article = get_object_or_404(Article, pk=pk)
         article.title = request.data.get("title")
         article.file = request.data.get("file")
-        article.cover_image =request.data.get("cover_image")
+        article.cover_image = request.data.get("cover_image")
         article.save()
         articletoauthor = authorToarticle.objects.filter(article=article).delete()
-        authors_data = request.data.get(
-            "authors", "[]"
-        ) 
+        authors_data = request.data.get("authors", "[]")
         authors_data = json.loads(authors_data)
         for author_data in authors_data:
-            a = author_data.get("author", author_data) 
-            new_author = Author.objects.create(firstname=a["firstname"],lastname=a["lastname"],phone_number=a["phone_number"],email=a["email"],title=a["title"])
-            authorToarticle.objects.create(article = article,author = new_author)
-            #Author.objects.create(firstname=author_data)
+            a = author_data.get("author", author_data)
+            new_author = Author.objects.create(
+                firstname=a["firstname"],
+                lastname=a["lastname"],
+                phone_number=a["phone_number"],
+                email=a["email"],
+                title=a["title"],
+            )
+            authorToarticle.objects.create(article=article, author=new_author)
+            # Author.objects.create(firstname=author_data)
         serializer = ArticleSerializer(article)
-            # serializer.save()
-        return Response(serializer.data,status=201)
-        #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # serializer.save()
+        return Response(serializer.data, status=201)
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# to send articles that are to be reviews to teh  frontend 
+
+# to send articles that are to be reviews to teh  frontend
 class get_Article_to_review_APIView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = ArticleSerializer
@@ -155,19 +173,23 @@ class get_Article_to_review_APIView(APIView):
         if pk:
             # article = get_object_or_404(Article, pk=pk)
             # authors = Author.objects.filter(article=article)
-            articles = Article.objects.filter(published=False,reviewed=False).prefetch_related(
+            articles = Article.objects.filter(
+                published=False, reviewed=False
+            ).prefetch_related(
                 Prefetch(
                     "authors",  # related_name from authorToarticle
                     queryset=authorToarticle.objects.select_related("author"),
                 )
             )
-            #for article in articles:
+            # for article in articles:
             #    for author in article.authors.all():
             # author_serializer = AuthorSerializer(authors, many=True)
             serializer = ArticleSerializer(article)
         else:
             # articles = Article.objects.all()
-            articles = Article.objects.filter(published=False,reviewed=False).prefetch_related(
+            articles = Article.objects.filter(
+                published=False, reviewed=False
+            ).prefetch_related(
                 Prefetch(
                     "authors",  # related_name from authorToarticle
                     queryset=authorToarticle.objects.select_related("author"),
@@ -189,7 +211,7 @@ class ArticleReviewSubmissionAPIView(APIView):
                 {"detail": "You must be a staff member to submit reviews."},
                 status=status.HTTP_403_FORBIDDEN,
             )
-        article_id = request.data.get('article')
+        article_id = request.data.get("article")
         article = get_object_or_404(Article, id=article_id)
 
         article.reviewed = True
@@ -205,7 +227,6 @@ class ArticleReviewSubmissionAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 # Create your views here.

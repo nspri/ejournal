@@ -35,7 +35,7 @@ const Home = () => {
     margin: theme.spacing(3, 0, 2),
   }));
   const navigate = useNavigate();
-  .log(articleData)
+  //.log(articleData)
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -43,7 +43,7 @@ const Home = () => {
         await fetchlatestpost();
         await fetchpodcast();
       } catch (error) {
-        .error("Error fetching data:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
@@ -103,10 +103,10 @@ const Home = () => {
 
       <Box height={50} />
 
-      <Grid container spacing={4} justifyContent="center" sx={{ backgroundColor: '#c0d3d9', padding: 3 }}>
+      <Grid container spacing={4} justifyContent="center" sx={{ padding: 3 }}>
         {articleData.map((item) => (
           < Grid item xs={12} sm={6} md={4} key={item.id} >
-            <Card sx={{ height: { xs: 400, sm: 450, md: 450 }, width: { xs: 300, sm: 300, md: 300, lg: 350, xl: 350 }, }}>
+            <Card sx={{ height: { xs: 300, sm: 300, md: 300 }, width: { xs: 200, sm: 300, md: 300, lg: 350, xl: 350 }, }}>
               <CardMedia
                 component="img"
                 height="180"

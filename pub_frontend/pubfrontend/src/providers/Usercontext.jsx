@@ -15,11 +15,10 @@ export const UserProvider = ({ children }) => {
   });
 
   // Fetch user data from API when logged in
-  const fetchUserData = async () => {
-    if (isLoggedIn) {
+  const fetcharticleData = async () => {
+    //if (isLoggedIn) {
       try {
-
-        const response = await fetch(`${dev_API_BASE_URL}${"/articles/articles"}`);//shop / getall'); // Replace with your API endpoint
+        const response = await fetch(`${dev_API_BASE_URL}${"/articles/articles/"}`);//shop / getall'); // Replace with your API endpoint
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -36,11 +35,11 @@ export const UserProvider = ({ children }) => {
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
-    }
+    //}
   };
 
   useEffect(() => {
-    fetchUserData();
+    fetcharticleData();
   }, [isLoggedIn]);
 
   const getItemById = (type, id) => {
