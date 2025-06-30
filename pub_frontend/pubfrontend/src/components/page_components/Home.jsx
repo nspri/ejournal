@@ -49,10 +49,10 @@ const Home = () => {
 
     fetchData();
   }, []);
-  const handlereadarticle = async (articleId) => {
-    let final_destination = `articles/article_detail/${articleId}/`
-    await get_article_html(final_destination);
-    navigate("/fileviewer");
+  const handlereadarticle = async (article) => {
+    //let final_destination = `articles/article_detail/${articleId}/`
+    //await get_article_html(final_destination);
+    navigate("/fileviewer",{ state: { article } });
   }
 
   return (
@@ -135,7 +135,7 @@ const Home = () => {
                     //to={`/post/${item.id}`}
                     variant="body2"
                     //sx={{ textDecoration: 'none' }}
-                    onClick={() => handlereadarticle(item.id)}
+                    onClick={() => handlereadarticle(item)}
                   >
                     Read More
                   </Link>
