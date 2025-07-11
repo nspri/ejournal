@@ -96,7 +96,7 @@ class LoginView(APIView):
                 "profilephoto": user.profile.image.url,
                 "title": user.profile.title,
                 "phonenumber": user.profile.phonenumber,
-                "articles_submitted": serialized_articles,
+                # "articles_submitted": serialized_articles,
                 # "is_staff": True,
                 "is_staff": user.is_staff,
             }

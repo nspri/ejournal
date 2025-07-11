@@ -14,6 +14,7 @@ import {
   Chip,
   Card,
   CardContent,
+  Switch, FormControlLabel
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ArticleIcon from "@mui/icons-material/Article";
@@ -33,6 +34,7 @@ function ReviewPage() {
   const { state } = useLocation();
   const { articleId } = useParams();
   const navigate = useNavigate();
+  const [approve, setApprove] = useState(null); // true = approve, false = disapprove, null = unset
   const [reviewText, setReviewText] = useState("");
   const [reviewFile, setReviewFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -66,6 +68,7 @@ function ReviewPage() {
   }, [article]);
 
   const handleSubmit = async () => {
+    console.log(approve)
   if (!reviewText.trim() && !reviewFile) {
     alert("Please enter a review or upload a review file.");
     return;
@@ -76,10 +79,12 @@ function ReviewPage() {
     alert("You must be logged in to submit a review.");
     return;
   }
+  
 
   const formData = new FormData();
   formData.append("article", articleId);        // article ID as integer/string
   formData.append("review_text", reviewText);   // review text
+  formData.append("approved", approve);
   if (reviewFile) {
     formData.append("review_file", reviewFile); // file object from input
   }
@@ -402,6 +407,27 @@ function ReviewPage() {
                   </Typography>
                 </Box>
               </Box>
+              <FormControlLabel
+    control={
+      <Switch
+        checked={approve === true}
+        onChange={(e) => setApprove(e.target.checked)}
+        color="success"
+      />
+    }
+    label="Approve"
+    labelPlacement="start"
+    sx={{
+      ml: 1,
+      mr: 1,
+      flex: 1,
+      fontWeight: 600,
+      ".MuiFormControlLabel-label": {
+        fontWeight: 600,
+        fontSize: "1rem",
+      },
+    }}
+  />
 
               <Stack direction="row" spacing={2} sx={{ mt: 4 }}>
                 <Button 

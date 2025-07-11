@@ -55,9 +55,9 @@ class ArticleSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user = self.context["request"].user
         # user_data = validated_data.pop("submitted_by", None)
-        #instance.updated_by = (
+        # instance.updated_by = (
         #    user  # Update the `updated_by` field with the current user
-        #)
+        # )
 
         # Save the changes to the article
         instance.save()
@@ -84,9 +84,19 @@ class createAuthorSerializer(serializers.ModelSerializer):
         model = Author
         fields = ["firstname", "lastname", "title", "phone_number", "email"]
 
+
 class ArticleReviewsSerializer(serializers.ModelSerializer):
     article = serializers.PrimaryKeyRelatedField(queryset=Article.objects.all())
+
     class Meta:
         model = articlereviews
-        fields = ['id', 'article', 'review_file', 'review_text', 'reviewed_at', 'updated_at']
-        read_only_fields = ['id', 'reviewed_at', 'updated_at']
+        fields = [
+            "id",
+            "article",
+            "review_file",
+            "approved",
+            "review_text",
+            "reviewed_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "reviewed_at", "updated_at"]

@@ -23,3 +23,6 @@
       setComicsData((prevData) => [...prevData, newData]);
       sessionStorage.setItem('comicsData', JSON.stringify([...comicsData, newData]));
     };
+    <Typography variant="body2" sx={{ mb: 2 }}>
+                                            {previews[article.id] || "Generating preview..."}
+                                        </Typography>

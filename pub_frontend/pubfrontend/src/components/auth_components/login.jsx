@@ -66,10 +66,10 @@ const Login = () => {
         profilePhoto: response.profilephoto,  // full path from user.profile.image.url
         title: response.title,
         phonenumber: response.phonenumber,
-        articles_submitted: response.articles_submitted,
+        //articles_submitted: response.articles_submitted,
       };
 
-      await generateArticlePreviews(userProfile.articles_submitted);
+      //await generateArticlePreviews(userProfile.articles_submitted);
       // Convert the object to a JSON string and store it
       localStorage.setItem('userProfile', JSON.stringify(userProfile));
 

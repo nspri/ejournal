@@ -20,6 +20,19 @@ from Articles.html_converters import extract_file_content
 
 
 # --- Article API View ---
+
+
+class article_submitted_by_user(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, *args, **kwargs):
+        user = request.user
+        user_articles = Article.objects.filter(submitted_by=user)
+        serialized_articles = ArticleSerializer(user_articles, many=True).data
+        response = serialized_articles
+        return Response(data=response, status=status.HTTP_200_OK)
+
+
 class PublishArticleView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -33,10 +46,14 @@ class PublishArticleView(APIView):
             )
 
         article_to_publish = get_object_or_404(Article, id=article_id)
+        articlereviewdetails = get_object_or_404(
+            articlereviews, article=article_to_publish
+        )
 
         if (
             article_to_publish.reviewed
             and request.user == article_to_publish.submitted_by
+            and articlereviewdetails.approved == True
         ):
             if article_to_publish.published == True:
                 article_to_publish.published = False
@@ -213,20 +230,20 @@ class ArticleReviewSubmissionAPIView(APIView):
             )
         article_id = request.data.get("article")
         article = get_object_or_404(Article, id=article_id)
+        if article.submitted_by != user:
+            article.reviewed = True
+            article.reviewed_by = user
+            article.save()
 
-        article.reviewed = True
-        article.reviewed_by = user
-        article.save()
+            # The data can come in form-data, so we combine data and files
 
-        # The data can come in form-data, so we combine data and files
-
-        serializer = self.serializer_class(data=request.data)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializer = self.serializer_class(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                print(serializer.data)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Create your views here.

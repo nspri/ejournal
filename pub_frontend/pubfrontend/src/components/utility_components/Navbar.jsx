@@ -18,7 +18,6 @@ const navItems = [
   { label: "Home", path: "/" },
   { label: "Articles" },
   { label: "About", path: "/about" },
-  { label: "Dashboard", path: "/dashboard" },
   { label: "Editorial Team", path: "/edit_team" },
   { label: "ISSUES", path: "/edit_team" },
   { label: "Ethics", path: "/ethics" },
@@ -66,7 +65,9 @@ const drop_downlabels = [
   { label: "ISSUES", items: issuesdropdown },
   { label: "Ethics", items: ethicsDropdown },
 ];
-
+const loggedinaccess =[
+  {label: "Dashboard", path: "/dashboard"},
+]
 const navAccess = [
   { label: "Login", path: "/login" },
   { label: "Register", path: "/register" }
@@ -102,7 +103,7 @@ function Navbar() {
     let updatedNav;
 
     if (isLoggedIn) {
-      updatedNav = [...navItems];
+      updatedNav = [...navItems,...loggedinaccess];
       if (isStaff === "true") {
         updatedNav = [...updatedNav, ...staffAccess];
       }

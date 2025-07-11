@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
+import axios from "axios";
 import {
     Box,
     Typography,
@@ -33,10 +34,31 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 export default function Dashboard() {
     const [loading, setLoading] = useState(false);
     const userProfile = JSON.parse(localStorage.getItem("userProfile")) || {};
-    
     const profileSrc = `${dev_API_BASE_URL}${userProfile.profilePhoto}`|| "/avatar.png";
     //console.log(profileSrc);
-    const [articles, setArticles] = useState(userProfile.articles_submitted || []);
+    //const [articles, setArticles] = useState(userProfile.articles_submitted || []);
+    const [articles, setArticles] = useState(null)
+  useEffect(() => {
+    const fetchUserArticles = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${dev_API_BASE_URL}/articles/user_articles/`, {
+          headers: {
+            'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+          },
+        });
+        console.log(response.data);
+        setArticles(response.data);
+        //console.log(articles);
+      } catch (error) {
+        console.error('Failed to fetch articles:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserArticles();
+  }, []);
 
 
     const [snackbar, setSnackbar] = useState({
@@ -161,9 +183,10 @@ export default function Dashboard() {
                         <CircularProgress />
                     </Box>
                 ) : (
-                    <Grid container spacing={2}>
-                        {articles.map((article, index) => (
-                            <Grid item xs={12} sm={6} md={4} key={article.id}>
+                    <Grid container spacing={2} justifyContent="center">
+                        {Array.isArray(articles) && articles.length > 0 ? (
+                            articles.map((article, index) => (
+                            <Grid  key={article.id} sx ={{width: { xs:200 , sm: 450, md:800, lg: 1000}}}>
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
@@ -211,11 +234,6 @@ export default function Dashboard() {
                                         <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                                             Submitted on: {new Date(article.created_at).toLocaleDateString()}
                                         </Typography>
-
-                                        <Typography variant="body2" sx={{ mb: 2 }}>
-                                            {previews[article.id] || "Generating preview..."}
-                                        </Typography>
-
                                         <Button
                                             variant="outlined"
                                             color="primary"
@@ -255,7 +273,11 @@ export default function Dashboard() {
                                     </Paper>
                                 </motion.div>
                             </Grid>
-                        ))}
+                        ))):(
+                        <Typography variant="body2" align="center">
+                            No submitted articles found.
+                        </Typography>
+                        )}
                     </Grid>
                 )}
 

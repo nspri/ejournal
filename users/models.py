@@ -59,5 +59,4 @@ class Profile(models.Model):
         return f"{self.user.username} Profile"
 
 
-
 # Create your models here.

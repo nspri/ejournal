@@ -4,6 +4,7 @@ from .views import (
     get_Article_to_review_APIView,
     ArticleReviewSubmissionAPIView,
     PublishArticleView,
+    article_submitted_by_user,
 )
 
 urlpatterns = [
@@ -14,6 +15,10 @@ urlpatterns = [
     path("articles2review/<int:pk>/", get_Article_to_review_APIView.as_view()),
     path("review_submissions/", ArticleReviewSubmissionAPIView.as_view()),
     path("publish_paper/", PublishArticleView.as_view()),
+    path(
+        "user_articles/",
+        article_submitted_by_user.as_view(),
+    ),
     # path('authors/', AuthorAPIView.as_view()),
     # path('authors/<int:pk>/', AuthorAPIView.as_view()),
 ]

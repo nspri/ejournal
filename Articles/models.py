@@ -44,17 +44,20 @@ class authorToarticle(models.Model):
     def __str__(self):
         return f"{self.author.firstname} {self.author.lastname} - {self.article.title}"
 
+
 class articlereviews(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
-    review_file = models.FileField(upload_to="review_files/",null=True,blank=True)
+    review_file = models.FileField(upload_to="review_files/", null=True, blank=True)
+    approved = models.BooleanField(default=False)
     review_text = models.TextField(
         blank=True,  # Allow blank in forms
-        null=True,   # Allow NULL in database
-        help_text="Content is optional."
+        null=True,  # Allow NULL in database
+        help_text="Content is optional.",
     )
     reviewed_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     # reviewed_by = models.ForeignKey(User, on_delete=models.CASCADE)
+
 
 # Create your models here.
